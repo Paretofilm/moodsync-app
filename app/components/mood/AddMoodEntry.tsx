@@ -174,9 +174,8 @@ export default function AddMoodEntry({
             acceptedFileTypes={["image/*"]}
             path="mood-selfies/"
             maxFileCount={1}
-            maxSize={5000000} // 5MB
             onUploadSuccess={(event) => {
-              setUploadedPhoto(event.path);
+              setUploadedPhoto(event.key);
             }}
             onUploadError={(error) => {
               console.error("Upload error:", error);
