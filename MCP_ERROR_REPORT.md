@@ -58,6 +58,20 @@ npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
 
 **Solution:** Update workflow to use Node 20
 
+## Issue 4: Incorrect Pipeline Deploy Command
+
+**MCP Involved:** amplify-pipeline-mcp
+
+**Problem:** The pipeline MCP generated workflow with `npx ampx pipeline-deploy` which is incorrect
+
+**Error Details:**
+- The workflow tried to use `npx ampx pipeline-deploy` which doesn't exist
+- Should trigger AWS Amplify build instead using AWS CLI
+
+**Root Cause:** Pipeline MCP generated incorrect deployment command
+
+**Solution:** Use `aws amplify start-job` to trigger Amplify builds
+
 ## Recommendations:
 1. Code generator should run `npm install` to generate a valid package-lock.json
 2. Pipeline MCP could check if initial deployment is complete before setup
