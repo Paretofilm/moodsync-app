@@ -1,6 +1,6 @@
 {
   "name": "moodsync-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "A social mood tracking application built with AWS Amplify Gen 2",
   "scripts": {
