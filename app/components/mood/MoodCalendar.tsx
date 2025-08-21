@@ -48,7 +48,7 @@ export default function MoodCalendar({
   useEffect(() => {
     const calendarEvents = moods.map((mood) => {
       const moodDate = new Date(mood.date);
-      const moodData = MOOD_TYPES[mood.moodType];
+      const moodData = mood.moodType ? MOOD_TYPES[mood.moodType] : null;
 
       return {
         id: mood.id,
@@ -153,8 +153,10 @@ export default function MoodCalendar({
       totalIntensity += mood.intensity;
 
       // Count mood types
-      stats.moodBreakdown[mood.moodType] =
-        (stats.moodBreakdown[mood.moodType] || 0) + 1;
+      if (mood.moodType) {
+        stats.moodBreakdown[mood.moodType] =
+          (stats.moodBreakdown[mood.moodType] || 0) + 1;
+      }
     });
 
     stats.averageIntensity =
@@ -259,7 +261,9 @@ export default function MoodCalendar({
             // Get dominant mood for the day
             const moodCounts = dayMoods.reduce(
               (acc, mood) => {
-                acc[mood.moodType] = (acc[mood.moodType] || 0) + 1;
+                if (mood.moodType) {
+                  acc[mood.moodType] = (acc[mood.moodType] || 0) + 1;
+                }
                 return acc;
               },
               {} as Record<string, number>,

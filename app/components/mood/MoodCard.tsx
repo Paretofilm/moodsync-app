@@ -24,7 +24,7 @@ export default function MoodCard({
 }: MoodCardProps) {
   const [showFullNote, setShowFullNote] = useState(false);
 
-  const moodData = MOOD_TYPES[mood.moodType];
+  const moodData = mood.moodType ? MOOD_TYPES[mood.moodType] : null;
   const moodDate = new Date(mood.date).toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
