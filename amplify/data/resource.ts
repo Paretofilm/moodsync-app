@@ -20,11 +20,10 @@ const schema = a.schema({
       bio: a.string(),
       profilePicture: a.string(), // S3 key for profile image
       isPrivate: a.boolean().default(false),
-      moodVisibility: a
-        .enum(["PUBLIC", "FRIENDS_ONLY", "PRIVATE"]),
+      moodVisibility: a.enum(["PUBLIC", "FRIENDS_ONLY", "PRIVATE"]),
       notificationsEnabled: a.boolean().default(true),
       weeklyInsightsEnabled: a.boolean().default(true),
-      
+
       // Relations
       moods: a.hasMany("Mood", "userId"),
       insights: a.hasMany("MoodInsight", "userId"),
@@ -44,10 +43,8 @@ const schema = a.schema({
   Mood: a
     .model({
       userId: a.string().required(),
-      moodType: a
-        .enum(["HAPPY", "SAD", "ENERGETIC", "CALM", "ANXIOUS"]),
-      moodColor: a
-        .enum(["YELLOW", "BLUE", "ORANGE", "GREEN", "PURPLE"]),
+      moodType: a.enum(["HAPPY", "SAD", "ENERGETIC", "CALM", "ANXIOUS"]),
+      moodColor: a.enum(["YELLOW", "BLUE", "ORANGE", "GREEN", "PURPLE"]),
       intensity: a.integer().required(), // 1-10 scale
       note: a.string(),
       photoKey: a.string(), // S3 key for mood selfie
@@ -67,9 +64,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [
       allow.owner(), // Mood owners can manage their moods
-      allow
-        .authenticated()
-        .to(["read"]), // All authenticated users can read
+      allow.authenticated().to(["read"]), // All authenticated users can read
     ]),
 
   // Friendship model for social connections
@@ -136,13 +131,12 @@ const schema = a.schema({
   MoodActivity: a
     .model({
       userId: a.string().required(),
-      activityType: a
-        .enum([
-          "MOOD_POSTED",
-          "COMMENT_ADDED",
-          "FRIEND_REQUEST_SENT",
-          "FRIEND_REQUEST_ACCEPTED",
-        ]),
+      activityType: a.enum([
+        "MOOD_POSTED",
+        "COMMENT_ADDED",
+        "FRIEND_REQUEST_SENT",
+        "FRIEND_REQUEST_ACCEPTED",
+      ]),
       targetUserId: a.string(), // User affected by the activity
       moodId: a.id(), // Related mood if applicable
       message: a.string(),

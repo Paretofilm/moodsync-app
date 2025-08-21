@@ -1,6 +1,7 @@
 # Backend Deployment Required
 
 ## Current Status
+
 ✅ CI/CD Pipeline is configured and working
 ✅ GitHub Actions has AWS credentials
 ✅ Amplify app exists (ID: d32q73w0m2w4bq)
@@ -19,6 +20,7 @@ npx ampx sandbox --app-id d32q73w0m2w4bq --branch main
 ```
 
 This will:
+
 1. Create the CloudFormation stack (amplify-d32q73w0m2w4bq-main-branch-c8c420b81a)
 2. Deploy all backend resources (Auth, Data, Storage)
 3. Take about 5-10 minutes
@@ -35,6 +37,7 @@ npx ampx pipeline-deploy --app-id d32q73w0m2w4bq --branch main
 Once the backend is deployed:
 
 1. **Trigger a new build**:
+
    ```bash
    git commit --allow-empty -m "Trigger build after backend deployment"
    git push
@@ -48,6 +51,7 @@ Once the backend is deployed:
 ## Expected Result
 
 After backend deployment, the Amplify build will:
+
 - ✅ Find the CloudFormation stack
 - ✅ Generate amplify_outputs.json
 - ✅ Build the Next.js app
@@ -57,7 +61,9 @@ After backend deployment, the Amplify build will:
 ## Troubleshooting
 
 If builds still fail after backend deployment:
+
 1. Check that the stack exists:
+
    ```bash
    aws cloudformation describe-stacks --stack-name amplify-d32q73w0m2w4bq-main-branch-c8c420b81a --region eu-north-1
    ```
@@ -69,6 +75,7 @@ If builds still fail after backend deployment:
 ## Why This Happens
 
 The Amplify build process needs:
+
 1. Backend resources to exist (CloudFormation stack)
 2. To generate amplify_outputs.json from those resources
 3. This config file for the frontend to connect to backend
