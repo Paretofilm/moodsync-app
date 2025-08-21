@@ -7,8 +7,16 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "MoodSync - Social Mood Tracking",
-  description: "Track, share, and understand your moods with friends. Get AI-powered insights about your emotional wellbeing.",
-  keywords: ["mood tracking", "mental health", "wellbeing", "social", "friends", "emotions"],
+  description:
+    "Track, share, and understand your moods with friends. Get AI-powered insights about your emotional wellbeing.",
+  keywords: [
+    "mood tracking",
+    "mental health",
+    "wellbeing",
+    "social",
+    "friends",
+    "emotions",
+  ],
   authors: [{ name: "MoodSync Team" }],
   viewport: "width=device-width, initial-scale=1",
   themeColor: "#4CAF50",
@@ -40,9 +48,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className={inter.className}>
-        <div id="app-root">
-          {children}
-        </div>
+        <div id="app-root">{children}</div>
       </body>
     </html>
   );

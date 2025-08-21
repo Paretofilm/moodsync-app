@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { generateClient } from 'aws-amplify/data';
-import { getCurrentUser } from 'aws-amplify/auth';
-import type { Schema } from '../../../amplify/data/resource';
-import MoodCard from './MoodCard';
+import { useState, useEffect } from "react";
+import { generateClient } from "aws-amplify/data";
+import { getCurrentUser } from "aws-amplify/auth";
+import type { Schema } from "../../../amplify/data/resource";
+import MoodCard from "./MoodCard";
 
 const client = generateClient<Schema>();
 
-type MoodData = Schema['Mood']['type'];
+type MoodData = Schema["Mood"]["type"];
 
 interface MoodFeedProps {
-  feedType?: 'friends' | 'public' | 'my_moods';
+  feedType?: "friends" | "public" | "my_moods";
   limit?: number;
   onMoodSelect?: (mood: MoodData) => void;
 }
 
-export default function MoodFeed({ 
-  feedType = 'friends', 
+export default function MoodFeed({
+  feedType = "friends",
   limit = 20,
-  onMoodSelect 
+  onMoodSelect,
 }: MoodFeedProps) {
   const [moods, setMoods] = useState<MoodData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [currentUserId, setCurrentUserId] = useState<string>("");
   const [friendIds, setFriendIds] = useState<string[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [nextToken, setNextToken] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export default function MoodFeed({
   }, []);
 
   useEffect(() => {
-    if (currentUserId && (feedType !== 'friends' || friendIds.length > 0)) {
+    if (currentUserId && (feedType !== "friends" || friendIds.length > 0)) {
       loadMoods();
       setupRealTimeSubscription();
     }
@@ -44,11 +44,11 @@ export default function MoodFeed({
       const user = await getCurrentUser();
       setCurrentUserId(user.userId);
 
-      if (feedType === 'friends') {
+      if (feedType === "friends") {
         await loadFriends(user.userId);
       }
     } catch (error) {
-      console.error('Error initializing:', error);
+      console.error("Error initializing:", error);
     }
   };
 
@@ -60,28 +60,28 @@ export default function MoodFeed({
           filter: {
             and: [
               { requesterId: { eq: userId } },
-              { status: { eq: 'ACCEPTED' } }
-            ]
-          }
+              { status: { eq: "ACCEPTED" } },
+            ],
+          },
         }),
         client.models.Friendship.list({
           filter: {
             and: [
               { addresseeId: { eq: userId } },
-              { status: { eq: 'ACCEPTED' } }
-            ]
-          }
-        })
+              { status: { eq: "ACCEPTED" } },
+            ],
+          },
+        }),
       ]);
 
       const friends = [
-        ...(asRequester.data?.map(f => f.addresseeId) || []),
-        ...(asAddressee.data?.map(f => f.requesterId) || [])
+        ...(asRequester.data?.map((f) => f.addresseeId) || []),
+        ...(asAddressee.data?.map((f) => f.requesterId) || []),
       ];
 
       setFriendIds(friends);
     } catch (error) {
-      console.error('Error loading friends:', error);
+      console.error("Error loading friends:", error);
       setFriendIds([]); // Continue with empty friends list
     }
   };
@@ -91,63 +91,65 @@ export default function MoodFeed({
       setIsLoading(refresh ? false : true);
 
       let query;
-      
+
       switch (feedType) {
-        case 'my_moods':
+        case "my_moods":
           query = client.models.Mood.list({
             filter: { userId: { eq: currentUserId } },
             limit,
-            nextToken: refresh ? null : nextToken
+            nextToken: refresh ? null : nextToken,
           });
           break;
-          
-        case 'public':
+
+        case "public":
           query = client.models.Mood.list({
             filter: { isPrivate: { eq: false } },
             limit,
-            nextToken: refresh ? null : nextToken
+            nextToken: refresh ? null : nextToken,
           });
           break;
-          
-        case 'friends':
+
+        case "friends":
         default:
           if (friendIds.length === 0) {
             setMoods([]);
             setIsLoading(false);
             return;
           }
-          
+
           query = client.models.Mood.list({
             filter: {
               and: [
                 { userId: { in: friendIds } },
-                { isPrivate: { eq: false } }
-              ]
+                { isPrivate: { eq: false } },
+              ],
             },
             limit,
-            nextToken: refresh ? null : nextToken
+            nextToken: refresh ? null : nextToken,
           });
           break;
       }
 
       const result = await query;
-      
+
       if (result.data) {
-        const sortedMoods = result.data.sort((a, b) => 
-          new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+        const sortedMoods = result.data.sort(
+          (a, b) =>
+            new Date(b.createdAt || "").getTime() -
+            new Date(a.createdAt || "").getTime(),
         );
 
         if (refresh) {
           setMoods(sortedMoods);
         } else {
-          setMoods(prev => [...prev, ...sortedMoods]);
+          setMoods((prev) => [...prev, ...sortedMoods]);
         }
 
         setNextToken(result.nextToken);
         setHasMore(!!result.nextToken);
       }
     } catch (error) {
-      console.error('Error loading moods:', error);
+      console.error("Error loading moods:", error);
     } finally {
       setIsLoading(false);
     }
@@ -160,33 +162,37 @@ export default function MoodFeed({
         if (isSynced) {
           // Filter items based on feed type
           let filteredItems = items;
-          
+
           switch (feedType) {
-            case 'my_moods':
-              filteredItems = items.filter(mood => mood.userId === currentUserId);
+            case "my_moods":
+              filteredItems = items.filter(
+                (mood) => mood.userId === currentUserId,
+              );
               break;
-            case 'public':
-              filteredItems = items.filter(mood => !mood.isPrivate);
+            case "public":
+              filteredItems = items.filter((mood) => !mood.isPrivate);
               break;
-            case 'friends':
+            case "friends":
             default:
-              filteredItems = items.filter(mood => 
-                friendIds.includes(mood.userId) && !mood.isPrivate
+              filteredItems = items.filter(
+                (mood) => friendIds.includes(mood.userId) && !mood.isPrivate,
               );
               break;
           }
 
           // Sort by creation date
-          const sortedItems = filteredItems.sort((a, b) => 
-            new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+          const sortedItems = filteredItems.sort(
+            (a, b) =>
+              new Date(b.createdAt || "").getTime() -
+              new Date(a.createdAt || "").getTime(),
           );
 
           setMoods(sortedItems.slice(0, limit));
         }
       },
       error: (error) => {
-        console.error('Real-time subscription error:', error);
-      }
+        console.error("Real-time subscription error:", error);
+      },
     });
 
     // Return cleanup function
@@ -197,12 +203,12 @@ export default function MoodFeed({
 
   const handleMoodComment = (moodId: string) => {
     // In a real app, this would open a comment modal or navigate to comment view
-    console.log('Comment on mood:', moodId);
+    console.log("Comment on mood:", moodId);
   };
 
   const handleMoodLike = async (moodId: string) => {
     // In a real app, this would handle liking/unliking
-    console.log('Like mood:', moodId);
+    console.log("Like mood:", moodId);
     // Could create a MoodLike model and implement like functionality
   };
 
@@ -219,25 +225,25 @@ export default function MoodFeed({
 
   const getFeedTitle = () => {
     switch (feedType) {
-      case 'my_moods':
-        return 'My Moods';
-      case 'public':
-        return 'Public Moods';
-      case 'friends':
+      case "my_moods":
+        return "My Moods";
+      case "public":
+        return "Public Moods";
+      case "friends":
       default:
-        return 'Friends\' Moods';
+        return "Friends' Moods";
     }
   };
 
   const getEmptyMessage = () => {
     switch (feedType) {
-      case 'my_moods':
+      case "my_moods":
         return "You haven't posted any moods yet. Start by sharing how you're feeling!";
-      case 'public':
+      case "public":
         return "No public moods available. Be the first to share!";
-      case 'friends':
+      case "friends":
       default:
-        return friendIds.length === 0 
+        return friendIds.length === 0
           ? "Connect with friends to see their mood updates here!"
           : "Your friends haven't shared any moods yet.";
     }
@@ -257,7 +263,7 @@ export default function MoodFeed({
       {/* Header */}
       <div className="feed-header">
         <h2>{getFeedTitle()}</h2>
-        <button 
+        <button
           className="refresh-button"
           onClick={refresh}
           disabled={isLoading}
@@ -267,7 +273,7 @@ export default function MoodFeed({
       </div>
 
       {/* Stats */}
-      {feedType === 'friends' && friendIds.length > 0 && (
+      {feedType === "friends" && friendIds.length > 0 && (
         <div className="feed-stats">
           <p>Following {friendIds.length} friends</p>
         </div>
@@ -286,7 +292,7 @@ export default function MoodFeed({
               <MoodCard
                 key={mood.id}
                 mood={mood}
-                showUserInfo={feedType !== 'my_moods'}
+                showUserInfo={feedType !== "my_moods"}
                 onComment={handleMoodComment}
                 onLike={handleMoodLike}
               />
@@ -300,7 +306,7 @@ export default function MoodFeed({
                   onClick={loadMore}
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Loading...' : 'Load More'}
+                  {isLoading ? "Loading..." : "Load More"}
                 </button>
               </div>
             )}
@@ -340,15 +346,19 @@ export default function MoodFeed({
           width: 40px;
           height: 40px;
           border: 3px solid #f3f3f3;
-          border-top: 3px solid #4CAF50;
+          border-top: 3px solid #4caf50;
           border-radius: 50%;
           animation: spin 1s linear infinite;
           margin-bottom: 1rem;
         }
 
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
 
         .feed-header {
@@ -375,9 +385,9 @@ export default function MoodFeed({
         }
 
         .refresh-button:hover:not(:disabled) {
-          background: #4CAF50;
+          background: #4caf50;
           color: white;
-          border-color: #4CAF50;
+          border-color: #4caf50;
         }
 
         .refresh-button:disabled {
@@ -425,7 +435,7 @@ export default function MoodFeed({
         }
 
         .load-more-button {
-          background: #4CAF50;
+          background: #4caf50;
           color: white;
           border: none;
           padding: 0.75rem 2rem;

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { FileUploader } from '@aws-amplify/ui-react-storage';
-import { generateClient } from 'aws-amplify/data';
-import { uploadData } from 'aws-amplify/storage';
-import type { Schema } from '../../../amplify/data/resource';
-import MoodSelector, { type MoodType, MOOD_TYPES } from './MoodSelector';
+import { useState, useRef } from "react";
+import { FileUploader } from "@aws-amplify/ui-react-storage";
+import { generateClient } from "aws-amplify/data";
+import { uploadData } from "aws-amplify/storage";
+import type { Schema } from "../../../amplify/data/resource";
+import MoodSelector, { type MoodType, MOOD_TYPES } from "./MoodSelector";
 
 const client = generateClient<Schema>();
 
@@ -14,13 +14,16 @@ interface AddMoodEntryProps {
   onCancel?: () => void;
 }
 
-export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProps) {
+export default function AddMoodEntry({
+  onMoodAdded,
+  onCancel,
+}: AddMoodEntryProps) {
   const [selectedMood, setSelectedMood] = useState<MoodType | undefined>();
   const [intensity, setIntensity] = useState(5);
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
-  const [spotifyLink, setSpotifyLink] = useState('');
+  const [tagInput, setTagInput] = useState("");
+  const [spotifyLink, setSpotifyLink] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
@@ -30,19 +33,19 @@ export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProp
     try {
       setIsUploading(true);
       const fileName = `mood-selfies/\${Date.now()}-\${file.name}`;
-      
+
       await uploadData({
         path: fileName,
         data: file,
         options: {
-          contentType: file.type
-        }
+          contentType: file.type,
+        },
       });
-      
+
       setUploadedPhoto(fileName);
     } catch (error) {
-      console.error('Error uploading photo:', error);
-      alert('Failed to upload photo. Please try again.');
+      console.error("Error uploading photo:", error);
+      alert("Failed to upload photo. Please try again.");
     } finally {
       setIsUploading(false);
     }
@@ -60,19 +63,19 @@ export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProp
   const addTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
       setTags([...tags, tagInput.trim()]);
-      setTagInput('');
+      setTagInput("");
     }
   };
 
   const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedMood) {
-      alert('Please select a mood');
+      alert("Please select a mood");
       return;
     }
 
@@ -80,39 +83,41 @@ export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProp
 
     try {
       const spotifyData = spotifyLink ? parseSpotifyLink(spotifyLink) : null;
-      const moodColor = Object.keys(MOOD_TYPES).find(key => key === selectedMood) as keyof typeof MOOD_TYPES;
-      
+      const moodColor = Object.keys(MOOD_TYPES).find(
+        (key) => key === selectedMood,
+      ) as keyof typeof MOOD_TYPES;
+
       const moodEntry = {
-        userId: '', // This will be set automatically by Amplify auth
+        userId: "", // This will be set automatically by Amplify auth
         moodType: selectedMood,
         moodColor: moodColor,
         intensity,
         note: note.trim() || undefined,
         photoKey: uploadedPhoto || undefined,
         spotifyTrackId: spotifyData?.trackId || undefined,
-        spotifyTrackName: '', // Would be populated from Spotify API
-        spotifyArtist: '', // Would be populated from Spotify API
+        spotifyTrackName: "", // Would be populated from Spotify API
+        spotifyArtist: "", // Would be populated from Spotify API
         tags: tags.length > 0 ? tags : undefined,
         isPrivate,
-        date: new Date().toISOString().split('T')[0], // Today's date
+        date: new Date().toISOString().split("T")[0], // Today's date
       };
 
       const result = await client.models.Mood.create(moodEntry);
-      
+
       if (result.data) {
         onMoodAdded?.(result.data.id);
         // Reset form
         setSelectedMood(undefined);
         setIntensity(5);
-        setNote('');
+        setNote("");
         setTags([]);
-        setSpotifyLink('');
+        setSpotifyLink("");
         setIsPrivate(false);
         setUploadedPhoto(null);
       }
     } catch (error) {
-      console.error('Error creating mood entry:', error);
-      alert('Failed to save mood entry. Please try again.');
+      console.error("Error creating mood entry:", error);
+      alert("Failed to save mood entry. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -157,7 +162,7 @@ export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProp
         <div className="form-group">
           <label>Add a mood selfie (optional)</label>
           <FileUploader
-            acceptedFileTypes={['image/*']}
+            acceptedFileTypes={["image/*"]}
             path="mood-selfies/"
             maxFileCount={1}
             maxSize={5000000} // 5MB
@@ -165,14 +170,12 @@ export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProp
               setUploadedPhoto(event.path);
             }}
             onUploadError={(error) => {
-              console.error('Upload error:', error);
+              console.error("Upload error:", error);
             }}
             isResumable
           />
           {uploadedPhoto && (
-            <div className="uploaded-photo">
-              ✓ Photo uploaded successfully
-            </div>
+            <div className="uploaded-photo">✓ Photo uploaded successfully</div>
           )}
         </div>
 
@@ -200,13 +203,17 @@ export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProp
               placeholder="Add a tag"
               disabled={isSubmitting}
               onKeyPress={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   e.preventDefault();
                   addTag();
                 }
               }}
             />
-            <button type="button" onClick={addTag} disabled={isSubmitting || !tagInput.trim()}>
+            <button
+              type="button"
+              onClick={addTag}
+              disabled={isSubmitting || !tagInput.trim()}
+            >
               Add
             </button>
           </div>
@@ -248,10 +255,12 @@ export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProp
             disabled={!selectedMood || isSubmitting || isUploading}
             className="submit-button"
             style={{
-              backgroundColor: selectedMood ? MOOD_TYPES[selectedMood].color : '#ccc'
+              backgroundColor: selectedMood
+                ? MOOD_TYPES[selectedMood].color
+                : "#ccc",
             }}
           >
-            {isSubmitting ? 'Saving...' : 'Save Mood'}
+            {isSubmitting ? "Saving..." : "Save Mood"}
           </button>
         </div>
       </form>
@@ -313,7 +322,7 @@ export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProp
         .form-group input:focus,
         .form-group textarea:focus {
           outline: none;
-          border-color: #4CAF50;
+          border-color: #4caf50;
         }
 
         .form-group small {
@@ -332,7 +341,7 @@ export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProp
 
         .tags-input button {
           padding: 0.75rem 1rem;
-          background: #4CAF50;
+          background: #4caf50;
           color: white;
           border: none;
           border-radius: 8px;
@@ -385,7 +394,7 @@ export default function AddMoodEntry({ onMoodAdded, onCancel }: AddMoodEntryProp
 
         .uploaded-photo {
           margin-top: 0.5rem;
-          color: #4CAF50;
+          color: #4caf50;
           font-weight: 500;
         }
 

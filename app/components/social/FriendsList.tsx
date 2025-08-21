@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { StorageImage } from '@aws-amplify/ui-react-storage';
-import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '../../../amplify/data/resource';
+import { useState, useEffect } from "react";
+import { StorageImage } from "@aws-amplify/ui-react-storage";
+import { generateClient } from "aws-amplify/data";
+import type { Schema } from "../../../amplify/data/resource";
 
 const client = generateClient<Schema>();
 
-type FriendshipData = Schema['Friendship']['type'];
-type UserProfileData = Schema['UserProfile']['type'];
+type FriendshipData = Schema["Friendship"]["type"];
+type UserProfileData = Schema["UserProfile"]["type"];
 
 interface Friend extends UserProfileData {
-  friendshipStatus: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'BLOCKED';
+  friendshipStatus: "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED";
   friendshipId: string;
 }
 
@@ -21,15 +21,15 @@ interface FriendsListProps {
   showPendingRequests?: boolean;
 }
 
-export default function FriendsList({ 
-  currentUserId, 
+export default function FriendsList({
+  currentUserId,
   onFriendSelect,
-  showPendingRequests = false 
+  showPendingRequests = false,
 }: FriendsListProps) {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [pendingRequests, setPendingRequests] = useState<Friend[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'friends' | 'pending'>('friends');
+  const [activeTab, setActiveTab] = useState<"friends" | "pending">("friends");
 
   useEffect(() => {
     fetchFriends();
@@ -42,20 +42,20 @@ export default function FriendsList({
       // Fetch friendships where current user is either requester or addressee
       const friendshipsAsRequester = await client.models.Friendship.list({
         filter: {
-          requesterId: { eq: currentUserId }
-        }
+          requesterId: { eq: currentUserId },
+        },
       });
 
       const friendshipsAsAddressee = await client.models.Friendship.list({
         filter: {
-          addresseeId: { eq: currentUserId }
-        }
+          addresseeId: { eq: currentUserId },
+        },
       });
 
       // Combine and process friendships
       const allFriendships = [
         ...(friendshipsAsRequester.data || []),
-        ...(friendshipsAsAddressee.data || [])
+        ...(friendshipsAsAddressee.data || []),
       ];
 
       // Separate accepted friends and pending requests
@@ -64,25 +64,26 @@ export default function FriendsList({
 
       for (const friendship of allFriendships) {
         // Determine the other user's ID
-        const otherUserId = friendship.requesterId === currentUserId 
-          ? friendship.addresseeId 
-          : friendship.requesterId;
+        const otherUserId =
+          friendship.requesterId === currentUserId
+            ? friendship.addresseeId
+            : friendship.requesterId;
 
         // Fetch the other user's profile
         const userProfile = await client.models.UserProfile.get({
-          userId: otherUserId
+          userId: otherUserId,
         });
 
         if (userProfile.data) {
           const friend: Friend = {
             ...userProfile.data,
             friendshipStatus: friendship.status,
-            friendshipId: `${friendship.requesterId}-${friendship.addresseeId}`
+            friendshipId: `${friendship.requesterId}-${friendship.addresseeId}`,
           };
 
-          if (friendship.status === 'ACCEPTED') {
+          if (friendship.status === "ACCEPTED") {
             acceptedFriends.push(friend);
-          } else if (friendship.status === 'PENDING') {
+          } else if (friendship.status === "PENDING") {
             pending.push(friend);
           }
         }
@@ -91,71 +92,82 @@ export default function FriendsList({
       setFriends(acceptedFriends);
       setPendingRequests(pending);
     } catch (error) {
-      console.error('Error fetching friends:', error);
+      console.error("Error fetching friends:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleFriendRequest = async (friendId: string, action: 'accept' | 'decline') => {
+  const handleFriendRequest = async (
+    friendId: string,
+    action: "accept" | "decline",
+  ) => {
     try {
       // Find the friendship record
       const friendship = await client.models.Friendship.get({
         requesterId: friendId,
-        addresseeId: currentUserId
+        addresseeId: currentUserId,
       });
 
       if (friendship.data) {
         await client.models.Friendship.update({
           requesterId: friendId,
           addresseeId: currentUserId,
-          status: action === 'accept' ? 'ACCEPTED' : 'DECLINED'
+          status: action === "accept" ? "ACCEPTED" : "DECLINED",
         });
 
         // Refresh the friends list
         fetchFriends();
       }
     } catch (error) {
-      console.error('Error handling friend request:', error);
+      console.error("Error handling friend request:", error);
     }
   };
 
   const removeFriend = async (friend: Friend) => {
-    if (!confirm(`Are you sure you want to remove ${friend.displayName || friend.username} from your friends?`)) {
+    if (
+      !confirm(
+        `Are you sure you want to remove ${friend.displayName || friend.username} from your friends?`,
+      )
+    ) {
       return;
     }
 
     try {
       // Delete the friendship record
-      const [requesterId, addresseeId] = friend.friendshipId.split('-');
+      const [requesterId, addresseeId] = friend.friendshipId.split("-");
       await client.models.Friendship.delete({
         requesterId,
-        addresseeId
+        addresseeId,
       });
 
       // Refresh the friends list
       fetchFriends();
     } catch (error) {
-      console.error('Error removing friend:', error);
+      console.error("Error removing friend:", error);
     }
   };
 
   const blockUser = async (friend: Friend) => {
-    if (!confirm(`Are you sure you want to block ${friend.displayName || friend.username}?`)) {
+    if (
+      !confirm(
+        `Are you sure you want to block ${friend.displayName || friend.username}?`,
+      )
+    ) {
       return;
     }
 
     try {
-      const [requesterId, addresseeId] = friend.friendshipId.split('-');
+      const [requesterId, addresseeId] = friend.friendshipId.split("-");
       await client.models.Friendship.update({
         requesterId,
         addresseeId,
-        status: 'BLOCKED'
+        status: "BLOCKED",
       });
 
       fetchFriends();
     } catch (error) {
-      console.error('Error blocking user:', error);
+      console.error("Error blocking user:", error);
     }
   };
 
@@ -173,15 +185,15 @@ export default function FriendsList({
       {/* Tabs */}
       <div className="friends-tabs">
         <button
-          className={`tab-button ${activeTab === 'friends' ? 'active' : ''}`}
-          onClick={() => setActiveTab('friends')}
+          className={`tab-button ${activeTab === "friends" ? "active" : ""}`}
+          onClick={() => setActiveTab("friends")}
         >
           Friends ({friends.length})
         </button>
         {showPendingRequests && (
           <button
-            className={`tab-button ${activeTab === 'pending' ? 'active' : ''}`}
-            onClick={() => setActiveTab('pending')}
+            className={`tab-button ${activeTab === "pending" ? "active" : ""}`}
+            onClick={() => setActiveTab("pending")}
           >
             Pending ({pendingRequests.length})
           </button>
@@ -189,7 +201,7 @@ export default function FriendsList({
       </div>
 
       {/* Friends List */}
-      {activeTab === 'friends' && (
+      {activeTab === "friends" && (
         <div className="friends-section">
           {friends.length === 0 ? (
             <div className="empty-state">
@@ -208,7 +220,9 @@ export default function FriendsList({
                       />
                     ) : (
                       <div className="default-avatar">
-                        {(friend.displayName || friend.username).charAt(0).toUpperCase()}
+                        {(friend.displayName || friend.username)
+                          .charAt(0)
+                          .toUpperCase()}
                       </div>
                     )}
                   </div>
@@ -217,9 +231,7 @@ export default function FriendsList({
                     <h4 className="friend-name">
                       {friend.displayName || friend.username}
                     </h4>
-                    {friend.bio && (
-                      <p className="friend-bio">{friend.bio}</p>
-                    )}
+                    {friend.bio && <p className="friend-bio">{friend.bio}</p>}
                   </div>
 
                   <div className="friend-actions">
@@ -249,7 +261,7 @@ export default function FriendsList({
       )}
 
       {/* Pending Requests */}
-      {activeTab === 'pending' && showPendingRequests && (
+      {activeTab === "pending" && showPendingRequests && (
         <div className="pending-section">
           {pendingRequests.length === 0 ? (
             <div className="empty-state">
@@ -268,7 +280,9 @@ export default function FriendsList({
                       />
                     ) : (
                       <div className="default-avatar">
-                        {(request.displayName || request.username).charAt(0).toUpperCase()}
+                        {(request.displayName || request.username)
+                          .charAt(0)
+                          .toUpperCase()}
                       </div>
                     )}
                   </div>
@@ -281,13 +295,17 @@ export default function FriendsList({
                   <div className="request-actions">
                     <button
                       className="accept-button"
-                      onClick={() => handleFriendRequest(request.userId, 'accept')}
+                      onClick={() =>
+                        handleFriendRequest(request.userId, "accept")
+                      }
                     >
                       Accept
                     </button>
                     <button
                       className="decline-button"
-                      onClick={() => handleFriendRequest(request.userId, 'decline')}
+                      onClick={() =>
+                        handleFriendRequest(request.userId, "decline")
+                      }
                     >
                       Decline
                     </button>
@@ -319,15 +337,19 @@ export default function FriendsList({
           width: 30px;
           height: 30px;
           border: 3px solid #f3f3f3;
-          border-top: 3px solid #4CAF50;
+          border-top: 3px solid #4caf50;
           border-radius: 50%;
           animation: spin 1s linear infinite;
           margin-bottom: 1rem;
         }
 
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
 
         .friends-tabs {
@@ -349,12 +371,12 @@ export default function FriendsList({
         }
 
         .tab-button:hover {
-          color: #4CAF50;
+          color: #4caf50;
         }
 
         .tab-button.active {
-          color: #4CAF50;
-          border-bottom-color: #4CAF50;
+          color: #4caf50;
+          border-bottom-color: #4caf50;
         }
 
         .empty-state {
@@ -374,7 +396,9 @@ export default function FriendsList({
           border-radius: 12px;
           padding: 1.5rem;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          transition: transform 0.2s, box-shadow 0.2s;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s;
         }
 
         .friend-card:hover {
@@ -402,7 +426,7 @@ export default function FriendsList({
         .default-avatar {
           width: 100%;
           height: 100%;
-          background: #4CAF50;
+          background: #4caf50;
           color: white;
           display: flex;
           align-items: center;
@@ -447,7 +471,7 @@ export default function FriendsList({
         }
 
         .view-button {
-          background: #4CAF50;
+          background: #4caf50;
           color: white;
           flex: 1;
         }
@@ -558,7 +582,7 @@ export default function FriendsList({
         }
 
         .accept-button {
-          background: #4CAF50;
+          background: #4caf50;
           color: white;
           border: none;
           padding: 0.5rem 1rem;

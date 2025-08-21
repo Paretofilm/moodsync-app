@@ -1,17 +1,22 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { StorageImage } from '@aws-amplify/ui-react-storage';
-import { generateClient } from 'aws-amplify/data';
-import { getCurrentUser } from 'aws-amplify/auth';
-import type { Schema } from '../../../amplify/data/resource';
+import { useState, useEffect, useRef } from "react";
+import { StorageImage } from "@aws-amplify/ui-react-storage";
+import { generateClient } from "aws-amplify/data";
+import { getCurrentUser } from "aws-amplify/auth";
+import type { Schema } from "../../../amplify/data/resource";
 
 const client = generateClient<Schema>();
 
-type UserProfileData = Schema['UserProfile']['type'];
+type UserProfileData = Schema["UserProfile"]["type"];
 
 interface UserSearchResult extends UserProfileData {
-  friendshipStatus?: 'NONE' | 'PENDING_SENT' | 'PENDING_RECEIVED' | 'FRIENDS' | 'BLOCKED';
+  friendshipStatus?:
+    | "NONE"
+    | "PENDING_SENT"
+    | "PENDING_RECEIVED"
+    | "FRIENDS"
+    | "BLOCKED";
 }
 
 interface FindFriendsProps {
@@ -19,11 +24,13 @@ interface FindFriendsProps {
 }
 
 export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<string>('');
-  const [friendships, setFriendships] = useState<Map<string, string>>(new Map());
+  const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [friendships, setFriendships] = useState<Map<string, string>>(
+    new Map(),
+  );
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
@@ -57,7 +64,7 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
       const user = await getCurrentUser();
       setCurrentUserId(user.userId);
     } catch (error) {
-      console.error('Error getting current user:', error);
+      console.error("Error getting current user:", error);
     }
   };
 
@@ -68,36 +75,46 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
       // Get all friendships involving current user
       const [asRequester, asAddressee] = await Promise.all([
         client.models.Friendship.list({
-          filter: { requesterId: { eq: currentUserId } }
+          filter: { requesterId: { eq: currentUserId } },
         }),
         client.models.Friendship.list({
-          filter: { addresseeId: { eq: currentUserId } }
-        })
+          filter: { addresseeId: { eq: currentUserId } },
+        }),
       ]);
 
       const friendshipMap = new Map<string, string>();
 
       // Process friendships where current user is the requester
-      asRequester.data?.forEach(friendship => {
-        friendshipMap.set(friendship.addresseeId, 
-          friendship.status === 'ACCEPTED' ? 'FRIENDS' : 
-          friendship.status === 'PENDING' ? 'PENDING_SENT' :
-          friendship.status === 'BLOCKED' ? 'BLOCKED' : 'NONE'
+      asRequester.data?.forEach((friendship) => {
+        friendshipMap.set(
+          friendship.addresseeId,
+          friendship.status === "ACCEPTED"
+            ? "FRIENDS"
+            : friendship.status === "PENDING"
+              ? "PENDING_SENT"
+              : friendship.status === "BLOCKED"
+                ? "BLOCKED"
+                : "NONE",
         );
       });
 
       // Process friendships where current user is the addressee
-      asAddressee.data?.forEach(friendship => {
-        friendshipMap.set(friendship.requesterId,
-          friendship.status === 'ACCEPTED' ? 'FRIENDS' :
-          friendship.status === 'PENDING' ? 'PENDING_RECEIVED' :
-          friendship.status === 'BLOCKED' ? 'BLOCKED' : 'NONE'
+      asAddressee.data?.forEach((friendship) => {
+        friendshipMap.set(
+          friendship.requesterId,
+          friendship.status === "ACCEPTED"
+            ? "FRIENDS"
+            : friendship.status === "PENDING"
+              ? "PENDING_RECEIVED"
+              : friendship.status === "BLOCKED"
+                ? "BLOCKED"
+                : "NONE",
         );
       });
 
       setFriendships(friendshipMap);
     } catch (error) {
-      console.error('Error loading friendships:', error);
+      console.error("Error loading friendships:", error);
     }
   };
 
@@ -111,24 +128,24 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
         filter: {
           or: [
             { username: { contains: searchQuery } },
-            { displayName: { contains: searchQuery } }
-          ]
-        }
+            { displayName: { contains: searchQuery } },
+          ],
+        },
       });
 
       if (result.data) {
         // Filter out current user and add friendship status
         const usersWithStatus = result.data
-          .filter(user => user.userId !== currentUserId)
-          .map(user => ({
+          .filter((user) => user.userId !== currentUserId)
+          .map((user) => ({
             ...user,
-            friendshipStatus: friendships.get(user.userId) || 'NONE'
+            friendshipStatus: friendships.get(user.userId) || "NONE",
           }));
 
         setSearchResults(usersWithStatus);
       }
     } catch (error) {
-      console.error('Error searching users:', error);
+      console.error("Error searching users:", error);
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -140,27 +157,27 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
       await client.models.Friendship.create({
         requesterId: currentUserId,
         addresseeId: targetUserId,
-        status: 'PENDING'
+        status: "PENDING",
       });
 
       // Update local state
       const updatedFriendships = new Map(friendships);
-      updatedFriendships.set(targetUserId, 'PENDING_SENT');
+      updatedFriendships.set(targetUserId, "PENDING_SENT");
       setFriendships(updatedFriendships);
 
       // Update search results
-      setSearchResults(results =>
-        results.map(user =>
+      setSearchResults((results) =>
+        results.map((user) =>
           user.userId === targetUserId
-            ? { ...user, friendshipStatus: 'PENDING_SENT' }
-            : user
-        )
+            ? { ...user, friendshipStatus: "PENDING_SENT" }
+            : user,
+        ),
       );
 
       onFriendRequestSent?.(targetUserId);
     } catch (error) {
-      console.error('Error sending friend request:', error);
-      alert('Failed to send friend request. Please try again.');
+      console.error("Error sending friend request:", error);
+      alert("Failed to send friend request. Please try again.");
     }
   };
 
@@ -168,37 +185,33 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
     try {
       await client.models.Friendship.delete({
         requesterId: currentUserId,
-        addresseeId: targetUserId
+        addresseeId: targetUserId,
       });
 
       // Update local state
       const updatedFriendships = new Map(friendships);
-      updatedFriendships.set(targetUserId, 'NONE');
+      updatedFriendships.set(targetUserId, "NONE");
       setFriendships(updatedFriendships);
 
       // Update search results
-      setSearchResults(results =>
-        results.map(user =>
+      setSearchResults((results) =>
+        results.map((user) =>
           user.userId === targetUserId
-            ? { ...user, friendshipStatus: 'NONE' }
-            : user
-        )
+            ? { ...user, friendshipStatus: "NONE" }
+            : user,
+        ),
       );
     } catch (error) {
-      console.error('Error canceling friend request:', error);
-      alert('Failed to cancel friend request. Please try again.');
+      console.error("Error canceling friend request:", error);
+      alert("Failed to cancel friend request. Please try again.");
     }
   };
 
   const getActionButton = (user: UserSearchResult) => {
     switch (user.friendshipStatus) {
-      case 'FRIENDS':
-        return (
-          <span className="status-badge friends">
-            ✓ Friends
-          </span>
-        );
-      case 'PENDING_SENT':
+      case "FRIENDS":
+        return <span className="status-badge friends">✓ Friends</span>;
+      case "PENDING_SENT":
         return (
           <button
             className="action-button cancel-button"
@@ -207,18 +220,12 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
             Cancel Request
           </button>
         );
-      case 'PENDING_RECEIVED':
+      case "PENDING_RECEIVED":
         return (
-          <span className="status-badge pending">
-            Pending Your Response
-          </span>
+          <span className="status-badge pending">Pending Your Response</span>
         );
-      case 'BLOCKED':
-        return (
-          <span className="status-badge blocked">
-            Blocked
-          </span>
-        );
+      case "BLOCKED":
+        return <span className="status-badge blocked">Blocked</span>;
       default:
         return (
           <button
@@ -245,19 +252,21 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
           />
           {isSearching && <div className="search-spinner">🔍</div>}
         </div>
-        
+
         {searchQuery.length > 0 && searchQuery.length < 2 && (
           <p className="search-hint">Type at least 2 characters to search</p>
         )}
       </div>
 
       <div className="results-section">
-        {searchResults.length === 0 && searchQuery.length >= 2 && !isSearching && (
-          <div className="no-results">
-            <p>No users found matching "{searchQuery}"</p>
-            <p>Try searching with different keywords.</p>
-          </div>
-        )}
+        {searchResults.length === 0 &&
+          searchQuery.length >= 2 &&
+          !isSearching && (
+            <div className="no-results">
+              <p>No users found matching "{searchQuery}"</p>
+              <p>Try searching with different keywords.</p>
+            </div>
+          )}
 
         {searchResults.length > 0 && (
           <div className="results-list">
@@ -272,7 +281,9 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
                     />
                   ) : (
                     <div className="default-avatar">
-                      {(user.displayName || user.username).charAt(0).toUpperCase()}
+                      {(user.displayName || user.username)
+                        .charAt(0)
+                        .toUpperCase()}
                     </div>
                   )}
                 </div>
@@ -284,21 +295,21 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
                   {user.displayName && user.username !== user.displayName && (
                     <p className="username">@{user.username}</p>
                   )}
-                  {user.bio && (
-                    <p className="user-bio">{user.bio}</p>
-                  )}
+                  {user.bio && <p className="user-bio">{user.bio}</p>}
                   <div className="user-privacy">
                     {user.isPrivate ? (
-                      <span className="privacy-badge private">🔒 Private Profile</span>
+                      <span className="privacy-badge private">
+                        🔒 Private Profile
+                      </span>
                     ) : (
-                      <span className="privacy-badge public">🌍 Public Profile</span>
+                      <span className="privacy-badge public">
+                        🌍 Public Profile
+                      </span>
                     )}
                   </div>
                 </div>
 
-                <div className="user-actions">
-                  {getActionButton(user)}
-                </div>
+                <div className="user-actions">{getActionButton(user)}</div>
               </div>
             ))}
           </div>
@@ -338,7 +349,7 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
 
         .search-input:focus {
           outline: none;
-          border-color: #4CAF50;
+          border-color: #4caf50;
         }
 
         .search-spinner {
@@ -349,8 +360,13 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
         }
 
         @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
+          }
         }
 
         .search-hint {
@@ -383,7 +399,9 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
           border-radius: 12px;
           padding: 1.5rem;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          transition: transform 0.2s, box-shadow 0.2s;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s;
         }
 
         .user-card:hover {
@@ -411,7 +429,7 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
         .default-avatar {
           width: 100%;
           height: 100%;
-          background: #4CAF50;
+          background: #4caf50;
           color: white;
           display: flex;
           align-items: center;
@@ -485,7 +503,7 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
         }
 
         .add-button {
-          background: #4CAF50;
+          background: #4caf50;
           color: white;
         }
 

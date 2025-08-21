@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 /**
  * Mood types and their corresponding colors for MoodSync
  */
 export const MOOD_TYPES = {
-  HAPPY: { color: '#FFD700', label: 'Happy', emoji: '😊' },
-  SAD: { color: '#4169E1', label: 'Sad', emoji: '😢' },
-  ENERGETIC: { color: '#FF8C00', label: 'Energetic', emoji: '⚡' },
-  CALM: { color: '#32CD32', label: 'Calm', emoji: '😌' },
-  ANXIOUS: { color: '#9370DB', label: 'Anxious', emoji: '😰' },
+  HAPPY: { color: "#FFD700", label: "Happy", emoji: "😊" },
+  SAD: { color: "#4169E1", label: "Sad", emoji: "😢" },
+  ENERGETIC: { color: "#FF8C00", label: "Energetic", emoji: "⚡" },
+  CALM: { color: "#32CD32", label: "Calm", emoji: "😌" },
+  ANXIOUS: { color: "#9370DB", label: "Anxious", emoji: "😰" },
 } as const;
 
 export type MoodType = keyof typeof MOOD_TYPES;
@@ -28,12 +28,12 @@ export default function MoodSelector({
   selectedIntensity = 5,
   onMoodChange,
   onIntensityChange,
-  disabled = false
+  disabled = false,
 }: MoodSelectorProps) {
   return (
     <div className="mood-selector">
       <h3 className="mood-selector-title">How are you feeling?</h3>
-      
+
       {/* Mood Type Selector */}
       <div className="mood-options">
         {Object.entries(MOOD_TYPES).map(([moodKey, moodData]) => {
@@ -42,11 +42,11 @@ export default function MoodSelector({
             <button
               key={moodKey}
               type="button"
-              className={`mood-option ${isSelected ? 'selected' : ''}`}
+              className={`mood-option ${isSelected ? "selected" : ""}`}
               style={{
-                backgroundColor: isSelected ? moodData.color : 'transparent',
+                backgroundColor: isSelected ? moodData.color : "transparent",
                 borderColor: moodData.color,
-                color: isSelected ? '#000' : moodData.color
+                color: isSelected ? "#000" : moodData.color,
               }}
               onClick={() => onMoodChange(moodKey as MoodType)}
               disabled={disabled}
@@ -76,7 +76,7 @@ export default function MoodSelector({
               disabled={disabled}
               className="intensity-slider"
               style={{
-                background: `linear-gradient(to right, ${MOOD_TYPES[selectedMood].color}30 0%, ${MOOD_TYPES[selectedMood].color} 100%)`
+                background: `linear-gradient(to right, ${MOOD_TYPES[selectedMood].color}30 0%, ${MOOD_TYPES[selectedMood].color} 100%)`,
               }}
             />
             <span className="intensity-max">10</span>

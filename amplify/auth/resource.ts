@@ -10,49 +10,49 @@ export const auth = defineAuth({
     email: true,
     externalProviders: {
       google: {
-        clientId: secret('GOOGLE_CLIENT_ID'),
-        clientSecret: secret('GOOGLE_CLIENT_SECRET'),
-        scopes: ['email', 'profile']
+        clientId: secret("GOOGLE_CLIENT_ID"),
+        clientSecret: secret("GOOGLE_CLIENT_SECRET"),
+        scopes: ["email", "profile"],
       },
       facebook: {
-        clientId: secret('FACEBOOK_CLIENT_ID'),
-        clientSecret: secret('FACEBOOK_CLIENT_SECRET'),
-        scopes: ['email', 'public_profile']
+        clientId: secret("FACEBOOK_CLIENT_ID"),
+        clientSecret: secret("FACEBOOK_CLIENT_SECRET"),
+        scopes: ["email", "public_profile"],
       },
       callbackUrls: [
-        'http://localhost:3000/',
-        'https://localhost:3000/',
+        "http://localhost:3000/",
+        "https://localhost:3000/",
         // Add your production domain when deployed
         // 'https://yourdomain.com/'
       ],
       logoutUrls: [
-        'http://localhost:3000/',
-        'https://localhost:3000/',
-        // Add your production domain when deployed  
+        "http://localhost:3000/",
+        "https://localhost:3000/",
+        // Add your production domain when deployed
         // 'https://yourdomain.com/'
-      ]
-    }
+      ],
+    },
   },
   userAttributes: {
     email: {
       required: true,
-      mutable: true
+      mutable: true,
     },
     givenName: {
       required: false,
-      mutable: true
+      mutable: true,
     },
     familyName: {
       required: false,
-      mutable: true
+      mutable: true,
     },
     nickname: {
-      required: false, 
-      mutable: true
+      required: false,
+      mutable: true,
     },
     picture: {
       required: false,
-      mutable: true
-    }
-  }
+      mutable: true,
+    },
+  },
 });

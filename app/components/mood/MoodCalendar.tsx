@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
-import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '../../../amplify/data/resource';
-import { MOOD_TYPES } from './MoodSelector';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { useState, useEffect } from "react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import moment from "moment";
+import { generateClient } from "aws-amplify/data";
+import type { Schema } from "../../../amplify/data/resource";
+import { MOOD_TYPES } from "./MoodSelector";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const localizer = momentLocalizer(moment);
 const client = generateClient<Schema>();
 
-type MoodData = Schema['Mood']['type'];
+type MoodData = Schema["Mood"]["type"];
 
 interface MoodEvent {
   id: string;
@@ -28,16 +28,16 @@ interface MoodCalendarProps {
   onMoodSelect?: (mood: MoodData) => void;
 }
 
-export default function MoodCalendar({ 
-  userId, 
-  onDateSelect, 
-  onMoodSelect 
+export default function MoodCalendar({
+  userId,
+  onDateSelect,
+  onMoodSelect,
 }: MoodCalendarProps) {
   const [moods, setMoods] = useState<MoodData[]>([]);
   const [events, setEvents] = useState<MoodEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [viewType, setViewType] = useState<'month' | 'week' | 'day'>('month');
+  const [viewType, setViewType] = useState<"month" | "week" | "day">("month");
 
   // Fetch moods for the current user
   useEffect(() => {
@@ -46,49 +46,49 @@ export default function MoodCalendar({
 
   // Convert moods to calendar events when moods change
   useEffect(() => {
-    const calendarEvents = moods.map(mood => {
+    const calendarEvents = moods.map((mood) => {
       const moodDate = new Date(mood.date);
       const moodData = MOOD_TYPES[mood.moodType];
-      
+
       return {
         id: mood.id,
         title: `${moodData.emoji} ${moodData.label} (${mood.intensity}/10)`,
         start: moodDate,
         end: moodDate,
         resource: mood,
-        color: moodData.color
+        color: moodData.color,
       };
     });
-    
+
     setEvents(calendarEvents);
   }, [moods]);
 
   const fetchMoods = async () => {
     try {
       setIsLoading(true);
-      
+
       let query = client.models.Mood.list();
-      
+
       // If userId is provided, filter by userId
       if (userId) {
         query = client.models.Mood.list({
           filter: {
-            userId: { eq: userId }
-          }
+            userId: { eq: userId },
+          },
         });
       }
 
       const result = await query;
-      
+
       if (result.data) {
         // Sort moods by date (newest first)
-        const sortedMoods = result.data.sort((a, b) => 
-          new Date(b.date).getTime() - new Date(a.date).getTime()
+        const sortedMoods = result.data.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
         );
         setMoods(sortedMoods);
       }
     } catch (error) {
-      console.error('Error fetching moods:', error);
+      console.error("Error fetching moods:", error);
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +99,7 @@ export default function MoodCalendar({
   };
 
   const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
-    const selectedDateMoods = moods.filter(mood => {
+    const selectedDateMoods = moods.filter((mood) => {
       const moodDate = new Date(mood.date);
       const slotDate = new Date(slotInfo.start);
       return (
@@ -117,12 +117,12 @@ export default function MoodCalendar({
     return {
       style: {
         backgroundColor: event.color,
-        color: '#000',
-        border: 'none',
-        borderRadius: '4px',
-        fontSize: '0.75rem',
-        padding: '2px 4px'
-      }
+        color: "#000",
+        border: "none",
+        borderRadius: "4px",
+        fontSize: "0.75rem",
+        padding: "2px 4px",
+      },
     };
   };
 
@@ -131,18 +131,21 @@ export default function MoodCalendar({
       total: moods.length,
       thisMonth: 0,
       averageIntensity: 0,
-      moodBreakdown: {} as Record<string, number>
+      moodBreakdown: {} as Record<string, number>,
     };
 
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
     let totalIntensity = 0;
 
-    moods.forEach(mood => {
+    moods.forEach((mood) => {
       const moodDate = new Date(mood.date);
-      
+
       // Count this month's moods
-      if (moodDate.getMonth() === currentMonth && moodDate.getFullYear() === currentYear) {
+      if (
+        moodDate.getMonth() === currentMonth &&
+        moodDate.getFullYear() === currentYear
+      ) {
         stats.thisMonth++;
       }
 
@@ -150,10 +153,14 @@ export default function MoodCalendar({
       totalIntensity += mood.intensity;
 
       // Count mood types
-      stats.moodBreakdown[mood.moodType] = (stats.moodBreakdown[mood.moodType] || 0) + 1;
+      stats.moodBreakdown[mood.moodType] =
+        (stats.moodBreakdown[mood.moodType] || 0) + 1;
     });
 
-    stats.averageIntensity = moods.length > 0 ? Math.round((totalIntensity / moods.length) * 10) / 10 : 0;
+    stats.averageIntensity =
+      moods.length > 0
+        ? Math.round((totalIntensity / moods.length) * 10) / 10
+        : 0;
 
     return stats;
   };
@@ -192,10 +199,10 @@ export default function MoodCalendar({
 
       {/* View Type Selector */}
       <div className="view-selector">
-        {(['month', 'week', 'day'] as const).map(view => (
+        {(["month", "week", "day"] as const).map((view) => (
           <button
             key={view}
-            className={`view-button ${viewType === view ? 'active' : ''}`}
+            className={`view-button ${viewType === view ? "active" : ""}`}
             onClick={() => setViewType(view)}
           >
             {view.charAt(0).toUpperCase() + view.slice(1)}
@@ -209,11 +216,13 @@ export default function MoodCalendar({
         <div className="legend-items">
           {Object.entries(MOOD_TYPES).map(([moodKey, moodData]) => (
             <div key={moodKey} className="legend-item">
-              <div 
+              <div
                 className="legend-color"
                 style={{ backgroundColor: moodData.color }}
               ></div>
-              <span>{moodData.emoji} {moodData.label}</span>
+              <span>
+                {moodData.emoji} {moodData.label}
+              </span>
             </div>
           ))}
         </div>
@@ -236,7 +245,7 @@ export default function MoodCalendar({
           selectable
           eventPropGetter={eventStyleGetter}
           dayPropGetter={(date) => {
-            const dayMoods = moods.filter(mood => {
+            const dayMoods = moods.filter((mood) => {
               const moodDate = new Date(mood.date);
               return (
                 moodDate.getFullYear() === date.getFullYear() &&
@@ -248,19 +257,23 @@ export default function MoodCalendar({
             if (dayMoods.length === 0) return {};
 
             // Get dominant mood for the day
-            const moodCounts = dayMoods.reduce((acc, mood) => {
-              acc[mood.moodType] = (acc[mood.moodType] || 0) + 1;
-              return acc;
-            }, {} as Record<string, number>);
+            const moodCounts = dayMoods.reduce(
+              (acc, mood) => {
+                acc[mood.moodType] = (acc[mood.moodType] || 0) + 1;
+                return acc;
+              },
+              {} as Record<string, number>,
+            );
 
-            const dominantMoodType = Object.entries(moodCounts)
-              .sort(([,a], [,b]) => b - a)[0][0] as keyof typeof MOOD_TYPES;
+            const dominantMoodType = Object.entries(moodCounts).sort(
+              ([, a], [, b]) => b - a,
+            )[0][0] as keyof typeof MOOD_TYPES;
 
             return {
               style: {
                 backgroundColor: `${MOOD_TYPES[dominantMoodType].color}20`,
-                border: `2px solid ${MOOD_TYPES[dominantMoodType].color}40`
-              }
+                border: `2px solid ${MOOD_TYPES[dominantMoodType].color}40`,
+              },
             };
           }}
         />
@@ -270,14 +283,14 @@ export default function MoodCalendar({
       {selectedDate && (
         <div className="selected-date-info">
           <h4>
-            {selectedDate.toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
+            {selectedDate.toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </h4>
-          {moods.filter(mood => {
+          {moods.filter((mood) => {
             const moodDate = new Date(mood.date);
             return (
               moodDate.getFullYear() === selectedDate.getFullYear() &&
@@ -310,15 +323,19 @@ export default function MoodCalendar({
           width: 40px;
           height: 40px;
           border: 3px solid #f3f3f3;
-          border-top: 3px solid #4CAF50;
+          border-top: 3px solid #4caf50;
           border-radius: 50%;
           animation: spin 1s linear infinite;
           margin-bottom: 1rem;
         }
 
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
 
         .calendar-header {
@@ -350,7 +367,7 @@ export default function MoodCalendar({
         .stat-number {
           font-size: 1.5rem;
           font-weight: 600;
-          color: #4CAF50;
+          color: #4caf50;
         }
 
         .stat-label {
@@ -376,13 +393,13 @@ export default function MoodCalendar({
         }
 
         .view-button:hover {
-          border-color: #4CAF50;
-          color: #4CAF50;
+          border-color: #4caf50;
+          color: #4caf50;
         }
 
         .view-button.active {
-          background: #4CAF50;
-          border-color: #4CAF50;
+          background: #4caf50;
+          border-color: #4caf50;
           color: white;
         }
 

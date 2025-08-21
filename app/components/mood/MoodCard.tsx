@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { StorageImage } from '@aws-amplify/ui-react-storage';
-import type { Schema } from '../../../amplify/data/resource';
-import { MOOD_TYPES } from './MoodSelector';
+import { useState } from "react";
+import { StorageImage } from "@aws-amplify/ui-react-storage";
+import type { Schema } from "../../../amplify/data/resource";
+import { MOOD_TYPES } from "./MoodSelector";
 
-type MoodData = Schema['Mood']['type'];
+type MoodData = Schema["Mood"]["type"];
 
 interface MoodCardProps {
   mood: MoodData;
@@ -20,16 +20,16 @@ export default function MoodCard({
   showUserInfo = false,
   onComment,
   onLike,
-  className = ''
+  className = "",
 }: MoodCardProps) {
   const [showFullNote, setShowFullNote] = useState(false);
-  
+
   const moodData = MOOD_TYPES[mood.moodType];
-  const moodDate = new Date(mood.date).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  const moodDate = new Date(mood.date).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   const truncateNote = (note: string, maxLength: number = 150) => {
@@ -38,10 +38,10 @@ export default function MoodCard({
   };
 
   const formatIntensity = (intensity: number) => {
-    if (intensity <= 3) return 'Low';
-    if (intensity <= 6) return 'Moderate';
-    if (intensity <= 8) return 'High';
-    return 'Very High';
+    if (intensity <= 3) return "Low";
+    if (intensity <= 6) return "Moderate";
+    if (intensity <= 8) return "High";
+    return "Very High";
   };
 
   return (
@@ -49,7 +49,7 @@ export default function MoodCard({
       {/* Header */}
       <div className="mood-header">
         <div className="mood-indicator">
-          <div 
+          <div
             className="mood-circle"
             style={{ backgroundColor: moodData.color }}
           >
@@ -88,7 +88,7 @@ export default function MoodCard({
               className="toggle-note"
               onClick={() => setShowFullNote(!showFullNote)}
             >
-              {showFullNote ? 'Show less' : 'Show more'}
+              {showFullNote ? "Show less" : "Show more"}
             </button>
           )}
         </div>
@@ -114,17 +114,15 @@ export default function MoodCard({
       {mood.tags && mood.tags.length > 0 && (
         <div className="mood-tags">
           {mood.tags.map((tag, index) => (
-            <span key={index} className="tag">{tag}</span>
+            <span key={index} className="tag">
+              {tag}
+            </span>
           ))}
         </div>
       )}
 
       {/* Privacy Indicator */}
-      {mood.isPrivate && (
-        <div className="privacy-indicator">
-          🔒 Private
-        </div>
-      )}
+      {mood.isPrivate && <div className="privacy-indicator">🔒 Private</div>}
 
       {/* Actions */}
       <div className="mood-actions">
@@ -143,9 +141,9 @@ export default function MoodCard({
           💬 Comment
         </button>
         <div className="mood-timestamp">
-          {new Date(mood.createdAt || '').toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit'
+          {new Date(mood.createdAt || "").toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
           })}
         </div>
       </div>
@@ -157,7 +155,9 @@ export default function MoodCard({
           box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
           margin-bottom: 1.5rem;
           overflow: hidden;
-          transition: transform 0.2s, box-shadow 0.2s;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s;
         }
 
         .mood-card:hover {
@@ -233,7 +233,7 @@ export default function MoodCard({
         .toggle-note {
           background: none;
           border: none;
-          color: #4CAF50;
+          color: #4caf50;
           cursor: pointer;
           font-size: 0.875rem;
           font-weight: 500;

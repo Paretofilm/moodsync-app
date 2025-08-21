@@ -5,28 +5,33 @@ A beautiful, social mood tracking application built with AWS Amplify Gen 2, Next
 ## ✨ Features
 
 ### 🎯 Core Mood Tracking
+
 - **Color-coded mood system**: Happy (Yellow), Sad (Blue), Energetic (Orange), Calm (Green), Anxious (Purple)
 - **Intensity scale**: 1-10 rating for each mood entry
 - **Rich entries**: Add notes, photos, Spotify tracks, and custom tags
 - **Privacy controls**: Keep moods private or share with friends
 
 ### 👥 Social Features
+
 - **Friend connections**: Send/accept friend requests
 - **Real-time feed**: See friends' mood updates live
 - **Comments & interactions**: Engage with friends' mood posts
 - **Privacy settings**: Control who can see your moods
 
 ### 📅 Mood History & Analytics
+
 - **Calendar view**: Visual history with color-coded days
 - **Mood patterns**: Track trends and identify patterns
 - **Weekly statistics**: Mood distribution and consistency metrics
 
 ### 🤖 AI-Powered Insights
+
 - **Weekly analysis**: AI-generated insights about mood patterns
 - **Personalized recommendations**: Suggestions based on your data
 - **Wellness scoring**: Track your emotional wellbeing over time
 
 ### 📱 Modern Experience
+
 - **Responsive design**: Works perfectly on desktop and mobile
 - **Real-time updates**: Live mood feed with instant notifications
 - **File uploads**: Secure photo storage with AWS S3
@@ -45,6 +50,7 @@ A beautiful, social mood tracking application built with AWS Amplify Gen 2, Next
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js v18.16.0 or later
 - npm v6.14.4 or later
 - AWS account (for deployment)
@@ -52,19 +58,23 @@ A beautiful, social mood tracking application built with AWS Amplify Gen 2, Next
 ### Local Development
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Configure Amplify**:
+
    ```bash
    npx ampx sandbox
    ```
+
    This will:
    - Deploy your backend to AWS
    - Create `amplify_outputs.json` with your configuration
 
 3. **Start the development server**:
+
    ```bash
    npm run dev
    ```
@@ -114,6 +124,7 @@ To enable Google and Facebook login, configure external providers:
 ### Deploy to AWS Amplify
 
 1. **Push your code to GitHub**:
+
    ```bash
    git add .
    git commit -m "Initial MoodSync setup"

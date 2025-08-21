@@ -1,34 +1,42 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Amplify } from 'aws-amplify';
-import { Authenticator } from '@aws-amplify/ui-react';
-import { getCurrentUser } from 'aws-amplify/auth';
-import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '@/amplify/data/resource';
-import outputs from '@/amplify_outputs.json';
-import '@aws-amplify/ui-react/styles.css';
-import './app.css';
+import { useState, useEffect } from "react";
+import { Amplify } from "aws-amplify";
+import { Authenticator } from "@aws-amplify/ui-react";
+import { getCurrentUser } from "aws-amplify/auth";
+import { generateClient } from "aws-amplify/data";
+import type { Schema } from "@/amplify/data/resource";
+import outputs from "@/amplify_outputs.json";
+import "@aws-amplify/ui-react/styles.css";
+import "./app.css";
 
 // Components
-import AddMoodEntry from './components/mood/AddMoodEntry';
-import MoodFeed from './components/mood/MoodFeed';
-import MoodCalendar from './components/mood/MoodCalendar';
-import FriendsList from './components/social/FriendsList';
-import FindFriends from './components/social/FindFriends';
-import MoodInsights from './components/insights/MoodInsights';
+import AddMoodEntry from "./components/mood/AddMoodEntry";
+import MoodFeed from "./components/mood/MoodFeed";
+import MoodCalendar from "./components/mood/MoodCalendar";
+import FriendsList from "./components/social/FriendsList";
+import FindFriends from "./components/social/FindFriends";
+import MoodInsights from "./components/insights/MoodInsights";
 
 Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
-type ViewType = 'dashboard' | 'add-mood' | 'calendar' | 'friends' | 'find-friends' | 'insights';
-type FeedType = 'friends' | 'public' | 'my_moods';
+type ViewType =
+  | "dashboard"
+  | "add-mood"
+  | "calendar"
+  | "friends"
+  | "find-friends"
+  | "insights";
+type FeedType = "friends" | "public" | "my_moods";
 
 export default function MoodSyncApp() {
-  const [currentView, setCurrentView] = useState<ViewType>('dashboard');
-  const [feedType, setFeedType] = useState<FeedType>('friends');
-  const [currentUserId, setCurrentUserId] = useState<string>('');
-  const [userProfile, setUserProfile] = useState<Schema['UserProfile']['type'] | null>(null);
+  const [currentView, setCurrentView] = useState<ViewType>("dashboard");
+  const [feedType, setFeedType] = useState<FeedType>("friends");
+  const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [userProfile, setUserProfile] = useState<
+    Schema["UserProfile"]["type"] | null
+  >(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
@@ -41,7 +49,7 @@ export default function MoodSyncApp() {
       setCurrentUserId(user.userId);
       await createOrUpdateUserProfile(user);
     } catch (error) {
-      console.error('Error initializing user:', error);
+      console.error("Error initializing user:", error);
     }
   };
 
@@ -49,7 +57,7 @@ export default function MoodSyncApp() {
     try {
       // Try to get existing profile
       let profile = await client.models.UserProfile.get({
-        userId: user.userId
+        userId: user.userId,
       });
 
       if (!profile.data) {
@@ -57,10 +65,10 @@ export default function MoodSyncApp() {
         const newProfile = await client.models.UserProfile.create({
           userId: user.userId,
           username: user.username || user.userId,
-          displayName: user.signInDetails?.loginId || user.username || 'User',
-          bio: '',
+          displayName: user.signInDetails?.loginId || user.username || "User",
+          bio: "",
           isPrivate: false,
-          moodVisibility: 'FRIENDS_ONLY',
+          moodVisibility: "FRIENDS_ONLY",
           notificationsEnabled: true,
           weeklyInsightsEnabled: true,
         });
@@ -69,38 +77,38 @@ export default function MoodSyncApp() {
         setUserProfile(profile.data);
       }
     } catch (error) {
-      console.error('Error creating/updating user profile:', error);
+      console.error("Error creating/updating user profile:", error);
     }
   };
 
   const handleMoodAdded = (moodId: string) => {
     // Refresh the feed when a new mood is added
-    setCurrentView('dashboard');
+    setCurrentView("dashboard");
   };
 
   const renderCurrentView = () => {
     switch (currentView) {
-      case 'add-mood':
+      case "add-mood":
         return (
           <AddMoodEntry
             onMoodAdded={handleMoodAdded}
-            onCancel={() => setCurrentView('dashboard')}
+            onCancel={() => setCurrentView("dashboard")}
           />
         );
-      case 'calendar':
+      case "calendar":
         return <MoodCalendar userId={currentUserId} />;
-      case 'friends':
+      case "friends":
         return (
           <FriendsList
             currentUserId={currentUserId}
             showPendingRequests={true}
           />
         );
-      case 'find-friends':
+      case "find-friends":
         return <FindFriends />;
-      case 'insights':
+      case "insights":
         return <MoodInsights userId={currentUserId} />;
-      case 'dashboard':
+      case "dashboard":
       default:
         return (
           <div className="dashboard">
@@ -108,19 +116,19 @@ export default function MoodSyncApp() {
             <div className="quick-actions">
               <button
                 className="quick-action-btn primary"
-                onClick={() => setCurrentView('add-mood')}
+                onClick={() => setCurrentView("add-mood")}
               >
                 ✨ Add Mood
               </button>
               <button
                 className="quick-action-btn"
-                onClick={() => setCurrentView('calendar')}
+                onClick={() => setCurrentView("calendar")}
               >
                 📅 Calendar
               </button>
               <button
                 className="quick-action-btn"
-                onClick={() => setCurrentView('insights')}
+                onClick={() => setCurrentView("insights")}
               >
                 🤖 Insights
               </button>
@@ -129,20 +137,20 @@ export default function MoodSyncApp() {
             {/* Feed Type Selector */}
             <div className="feed-selector">
               <button
-                className={`feed-btn ${feedType === 'friends' ? 'active' : ''}`}
-                onClick={() => setFeedType('friends')}
+                className={`feed-btn ${feedType === "friends" ? "active" : ""}`}
+                onClick={() => setFeedType("friends")}
               >
                 👥 Friends
               </button>
               <button
-                className={`feed-btn ${feedType === 'my_moods' ? 'active' : ''}`}
-                onClick={() => setFeedType('my_moods')}
+                className={`feed-btn ${feedType === "my_moods" ? "active" : ""}`}
+                onClick={() => setFeedType("my_moods")}
               >
                 🧑 My Moods
               </button>
               <button
-                className={`feed-btn ${feedType === 'public' ? 'active' : ''}`}
-                onClick={() => setFeedType('public')}
+                className={`feed-btn ${feedType === "public" ? "active" : ""}`}
+                onClick={() => setFeedType("public")}
               >
                 🌍 Public
               </button>
@@ -168,24 +176,24 @@ export default function MoodSyncApp() {
                   MoodSync
                 </h1>
               </div>
-              
+
               <div className="header-center">
                 <nav className="desktop-nav">
                   <button
-                    className={`nav-btn ${currentView === 'dashboard' ? 'active' : ''}`}
-                    onClick={() => setCurrentView('dashboard')}
+                    className={`nav-btn ${currentView === "dashboard" ? "active" : ""}`}
+                    onClick={() => setCurrentView("dashboard")}
                   >
                     🏠 Home
                   </button>
                   <button
-                    className={`nav-btn ${currentView === 'friends' ? 'active' : ''}`}
-                    onClick={() => setCurrentView('friends')}
+                    className={`nav-btn ${currentView === "friends" ? "active" : ""}`}
+                    onClick={() => setCurrentView("friends")}
                   >
                     👥 Friends
                   </button>
                   <button
-                    className={`nav-btn ${currentView === 'find-friends' ? 'active' : ''}`}
-                    onClick={() => setCurrentView('find-friends')}
+                    className={`nav-btn ${currentView === "find-friends" ? "active" : ""}`}
+                    onClick={() => setCurrentView("find-friends")}
                   >
                     🔍 Discover
                   </button>
@@ -195,13 +203,14 @@ export default function MoodSyncApp() {
               <div className="header-right">
                 <div className="user-menu">
                   <span className="user-greeting">
-                    Hi, {userProfile?.displayName || user?.username || 'User'}! 👋
+                    Hi, {userProfile?.displayName || user?.username || "User"}!
+                    👋
                   </span>
                   <button className="sign-out-btn" onClick={signOut}>
                     Sign out
                   </button>
                 </div>
-                
+
                 <button
                   className="mobile-menu-btn"
                   onClick={() => setShowMobileMenu(!showMobileMenu)}
@@ -215,63 +224,60 @@ export default function MoodSyncApp() {
             {showMobileMenu && (
               <div className="mobile-menu">
                 <button
-                  className={`mobile-nav-btn ${currentView === 'dashboard' ? 'active' : ''}`}
+                  className={`mobile-nav-btn ${currentView === "dashboard" ? "active" : ""}`}
                   onClick={() => {
-                    setCurrentView('dashboard');
+                    setCurrentView("dashboard");
                     setShowMobileMenu(false);
                   }}
                 >
                   🏠 Home
                 </button>
                 <button
-                  className={`mobile-nav-btn ${currentView === 'add-mood' ? 'active' : ''}`}
+                  className={`mobile-nav-btn ${currentView === "add-mood" ? "active" : ""}`}
                   onClick={() => {
-                    setCurrentView('add-mood');
+                    setCurrentView("add-mood");
                     setShowMobileMenu(false);
                   }}
                 >
                   ✨ Add Mood
                 </button>
                 <button
-                  className={`mobile-nav-btn ${currentView === 'friends' ? 'active' : ''}`}
+                  className={`mobile-nav-btn ${currentView === "friends" ? "active" : ""}`}
                   onClick={() => {
-                    setCurrentView('friends');
+                    setCurrentView("friends");
                     setShowMobileMenu(false);
                   }}
                 >
                   👥 Friends
                 </button>
                 <button
-                  className={`mobile-nav-btn ${currentView === 'find-friends' ? 'active' : ''}`}
+                  className={`mobile-nav-btn ${currentView === "find-friends" ? "active" : ""}`}
                   onClick={() => {
-                    setCurrentView('find-friends');
+                    setCurrentView("find-friends");
                     setShowMobileMenu(false);
                   }}
                 >
                   🔍 Discover
                 </button>
                 <button
-                  className={`mobile-nav-btn ${currentView === 'calendar' ? 'active' : ''}`}
+                  className={`mobile-nav-btn ${currentView === "calendar" ? "active" : ""}`}
                   onClick={() => {
-                    setCurrentView('calendar');
+                    setCurrentView("calendar");
                     setShowMobileMenu(false);
                   }}
                 >
                   📅 Calendar
                 </button>
                 <button
-                  className={`mobile-nav-btn ${currentView === 'insights' ? 'active' : ''}`}
+                  className={`mobile-nav-btn ${currentView === "insights" ? "active" : ""}`}
                   onClick={() => {
-                    setCurrentView('insights');
+                    setCurrentView("insights");
                     setShowMobileMenu(false);
                   }}
                 >
                   🤖 Insights
                 </button>
-                <button
-                  className="mobile-nav-btn sign-out"
-                  onClick={signOut}
-                >
+                <button className="mobile-nav-btn sign-out" onClick={signOut}>
                   👋 Sign Out
                 </button>
               </div>
@@ -279,15 +285,13 @@ export default function MoodSyncApp() {
           </header>
 
           {/* Main Content */}
-          <main className="app-main">
-            {renderCurrentView()}
-          </main>
+          <main className="app-main">{renderCurrentView()}</main>
 
           {/* Floating Add Button (Mobile) */}
           <div className="floating-actions">
             <button
               className="floating-add-btn"
-              onClick={() => setCurrentView('add-mood')}
+              onClick={() => setCurrentView("add-mood")}
               title="Add new mood"
             >
               +
@@ -321,7 +325,7 @@ export default function MoodSyncApp() {
               margin: 0;
               font-size: 1.5rem;
               font-weight: 600;
-              color: #4CAF50;
+              color: #4caf50;
               display: flex;
               align-items: center;
               gap: 0.5rem;
@@ -353,7 +357,7 @@ export default function MoodSyncApp() {
             }
 
             .nav-btn.active {
-              background: #4CAF50;
+              background: #4caf50;
               color: white;
             }
 
@@ -418,7 +422,7 @@ export default function MoodSyncApp() {
             }
 
             .mobile-nav-btn.active {
-              background: #4CAF50;
+              background: #4caf50;
               color: white;
             }
 
@@ -463,9 +467,9 @@ export default function MoodSyncApp() {
             }
 
             .quick-action-btn.primary {
-              background: #4CAF50;
+              background: #4caf50;
               color: white;
-              border-color: #4CAF50;
+              border-color: #4caf50;
             }
 
             .quick-action-btn.primary:hover {
@@ -501,7 +505,7 @@ export default function MoodSyncApp() {
             }
 
             .feed-btn.active {
-              background: #4CAF50;
+              background: #4caf50;
               color: white;
             }
 
@@ -516,7 +520,7 @@ export default function MoodSyncApp() {
               width: 60px;
               height: 60px;
               border-radius: 50%;
-              background: #4CAF50;
+              background: #4caf50;
               color: white;
               border: none;
               font-size: 2rem;

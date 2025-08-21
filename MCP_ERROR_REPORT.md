@@ -7,6 +7,7 @@
 **Problem:** The generated `package-lock.json` had dependency conflicts causing `npm ci` to fail in AWS Amplify build
 
 **Error Details:**
+
 ```
 npm error Invalid: lock file's react-remove-scroll-bar@2.3.6 does not satisfy react-remove-scroll-bar@2.3.8
 npm error Invalid: lock file's react-style-singleton@2.2.1 does not satisfy react-style-singleton@2.2.3
@@ -31,12 +32,14 @@ npm error Missing: globalize@0.1.1 from lock file
 ## Observations
 
 ### What Worked Well:
+
 1. ✅ amplify-gen-2-code-generator successfully created the complete app structure
 2. ✅ All Gen 2 patterns were correctly used (defineData, defineAuth, etc.)
 3. ✅ amplify-pipeline-mcp successfully set up CI/CD with auto-fix
 4. ✅ amplify-gen-2-nextjs-docs provided accurate documentation
 
 ### What Needs Improvement:
+
 1. ⚠️ Package-lock.json generation needs to be more robust
 2. ⚠️ Initial deployment should complete before pipeline setup (timing issue)
 
@@ -47,6 +50,7 @@ npm error Missing: globalize@0.1.1 from lock file
 **Problem:** The pipeline MCP generated GitHub Actions workflow with Node 18, but modern Amplify packages require Node 20+
 
 **Error Details:**
+
 ```
 npm warn EBADENGINE Unsupported engine {
 npm warn EBADENGINE   package: '@isaacs/balanced-match@4.0.1',
@@ -65,6 +69,7 @@ npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
 **Problem:** The pipeline MCP generated workflow with `npx ampx pipeline-deploy` which is incorrect
 
 **Error Details:**
+
 - The workflow tried to use `npx ampx pipeline-deploy` which doesn't exist
 - Should trigger AWS Amplify build instead using AWS CLI
 
@@ -73,6 +78,7 @@ npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
 **Solution:** Use `aws amplify start-job` to trigger Amplify builds
 
 ## Recommendations:
+
 1. Code generator should run `npm install` to generate a valid package-lock.json
 2. Pipeline MCP could check if initial deployment is complete before setup
 3. Add validation for package-lock.json consistency
