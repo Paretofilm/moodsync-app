@@ -47,6 +47,7 @@ Since you're using AWS SSO, you need to create programmatic access keys for GitH
 ### Option 2: Use Temporary Credentials (Less Secure)
 
 You can export your current SSO credentials temporarily:
+
 ```bash
 aws configure export-credentials --profile aws-development
 ```
@@ -63,9 +64,8 @@ However, these expire and need regular renewal.
    - Click "Secrets and variables" → "Actions"
 
 3. **Add Repository Secrets**:
-   
-   Click "New repository secret" for each:
 
+   Click "New repository secret" for each:
    - **Name**: `AWS_ACCESS_KEY_ID`
    - **Value**: Your AWS Access Key ID (starts with `AKIA...`)
 
@@ -77,6 +77,7 @@ However, these expire and need regular renewal.
 After adding the secrets, test by:
 
 1. **Re-run the failed workflow**:
+
    ```bash
    gh workflow run amplify-pipeline-main.yml
    ```
@@ -97,6 +98,7 @@ After adding the secrets, test by:
 - ❌ Amplify deployment blocked by missing credentials
 
 Once you add the AWS credentials, the pipeline will:
+
 1. Run on every push to main
 2. Auto-fix linting and formatting issues
 3. Trigger Amplify deployment
