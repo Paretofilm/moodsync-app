@@ -31,8 +31,7 @@ export const storage = defineStorage({
     // Public shared content - mood images that users explicitly make public
     "public-moods/*": [
       allow.guest.to(["read"]),
-      allow.authenticated.to(["read"]),
-      allow.authenticated.to(["write"]), // Authenticated users can contribute
+      allow.authenticated.to(["read", "write"]), // Authenticated users can read and contribute
     ],
   }),
 });

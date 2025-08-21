@@ -8,6 +8,11 @@ import { defineAuth, secret } from "@aws-amplify/backend";
 export const auth = defineAuth({
   loginWith: {
     email: true,
+    // Social providers disabled until secrets are configured
+    // To enable social login:
+    // 1. Set up secrets in AWS Systems Manager Parameter Store
+    // 2. Uncomment the externalProviders section below
+    /*
     externalProviders: {
       google: {
         clientId: secret("GOOGLE_CLIENT_ID"),
@@ -32,6 +37,7 @@ export const auth = defineAuth({
         // 'https://yourdomain.com/'
       ],
     },
+    */
   },
   userAttributes: {
     email: {
@@ -50,9 +56,6 @@ export const auth = defineAuth({
       required: false,
       mutable: true,
     },
-    picture: {
-      required: false,
-      mutable: true,
-    },
+    // picture attribute removed - not supported in UserAttributes
   },
 });

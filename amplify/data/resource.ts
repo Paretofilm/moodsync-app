@@ -21,10 +21,18 @@ const schema = a.schema({
       profilePicture: a.string(), // S3 key for profile image
       isPrivate: a.boolean().default(false),
       moodVisibility: a
-        .enum(["PUBLIC", "FRIENDS_ONLY", "PRIVATE"])
-        .default("FRIENDS_ONLY"),
+        .enum(["PUBLIC", "FRIENDS_ONLY", "PRIVATE"]),
       notificationsEnabled: a.boolean().default(true),
       weeklyInsightsEnabled: a.boolean().default(true),
+      
+      // Relations
+      moods: a.hasMany("Mood", "userId"),
+      insights: a.hasMany("MoodInsight", "userId"),
+      sentFriendRequests: a.hasMany("Friendship", "requesterId"),
+      receivedFriendRequests: a.hasMany("Friendship", "addresseeId"),
+      comments: a.hasMany("MoodComment", "commenterId"),
+      activities: a.hasMany("MoodActivity", "userId"),
+      targetActivities: a.hasMany("MoodActivity", "targetUserId"),
     })
     .authorization((allow) => [
       allow.owner(), // Users can manage their own profile
@@ -37,11 +45,9 @@ const schema = a.schema({
     .model({
       userId: a.string().required(),
       moodType: a
-        .enum(["HAPPY", "SAD", "ENERGETIC", "CALM", "ANXIOUS"])
-        .required(),
+        .enum(["HAPPY", "SAD", "ENERGETIC", "CALM", "ANXIOUS"]),
       moodColor: a
-        .enum(["YELLOW", "BLUE", "ORANGE", "GREEN", "PURPLE"])
-        .required(),
+        .enum(["YELLOW", "BLUE", "ORANGE", "GREEN", "PURPLE"]),
       intensity: a.integer().required(), // 1-10 scale
       note: a.string(),
       photoKey: a.string(), // S3 key for mood selfie
@@ -57,13 +63,13 @@ const schema = a.schema({
       // Relations
       userProfile: a.belongsTo("UserProfile", "userId"),
       comments: a.hasMany("MoodComment", "moodId"),
+      activities: a.hasMany("MoodActivity", "moodId"),
     })
     .authorization((allow) => [
       allow.owner(), // Mood owners can manage their moods
       allow
         .authenticated()
-        .to(["read"])
-        .where((mood) => mood.isPrivate.eq(false)), // Public moods
+        .to(["read"]), // All authenticated users can read
     ]),
 
   // Friendship model for social connections
@@ -71,7 +77,7 @@ const schema = a.schema({
     .model({
       requesterId: a.string().required(), // User who sent friend request
       addresseeId: a.string().required(), // User who received friend request
-      status: a.enum(["PENDING", "ACCEPTED", "DECLINED", "BLOCKED"]).required(),
+      status: a.enum(["PENDING", "ACCEPTED", "DECLINED", "BLOCKED"]),
       createdAt: a.datetime(),
       updatedAt: a.datetime(),
 
@@ -136,8 +142,7 @@ const schema = a.schema({
           "COMMENT_ADDED",
           "FRIEND_REQUEST_SENT",
           "FRIEND_REQUEST_ACCEPTED",
-        ])
-        .required(),
+        ]),
       targetUserId: a.string(), // User affected by the activity
       moodId: a.id(), // Related mood if applicable
       message: a.string(),
