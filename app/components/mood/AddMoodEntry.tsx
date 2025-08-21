@@ -83,14 +83,20 @@ export default function AddMoodEntry({
 
     try {
       const spotifyData = spotifyLink ? parseSpotifyLink(spotifyLink) : null;
-      const moodColor = Object.keys(MOOD_TYPES).find(
-        (key) => key === selectedMood,
-      ) as keyof typeof MOOD_TYPES;
+      
+      // Map mood type to color enum
+      const moodColorMap: Record<keyof typeof MOOD_TYPES, "YELLOW" | "BLUE" | "ORANGE" | "GREEN" | "PURPLE"> = {
+        HAPPY: "YELLOW",
+        SAD: "BLUE",
+        ENERGETIC: "ORANGE",
+        CALM: "GREEN",
+        ANXIOUS: "PURPLE"
+      };
 
       const moodEntry = {
         userId: "", // This will be set automatically by Amplify auth
         moodType: selectedMood,
-        moodColor: moodColor,
+        moodColor: moodColorMap[selectedMood],
         intensity,
         note: note.trim() || undefined,
         photoKey: uploadedPhoto || undefined,
