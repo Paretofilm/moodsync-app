@@ -208,7 +208,7 @@ export default function MoodInsights({ userId }: MoodInsightsProps) {
   ) => {
     if (!stats) return "";
 
-    const moodLabel = MOOD_TYPES[dominantMood].label.toLowerCase();
+    const moodLabel = dominantMood && MOOD_TYPES[dominantMood] ? MOOD_TYPES[dominantMood].label.toLowerCase() : "varied";
     const insights = [
       `This week, you've been predominantly ${moodLabel}, which appeared in ${Math.round((stats.moodDistribution[dominantMood] / stats.totalMoods) * 100)}% of your mood entries.`,
       `Your average mood intensity was ${stats.averageIntensity}/10, indicating ${stats.averageIntensity >= 7 ? "strong" : stats.averageIntensity >= 5 ? "moderate" : "mild"} emotional experiences.`,
@@ -419,8 +419,14 @@ export default function MoodInsights({ userId }: MoodInsightsProps) {
             <div className="insight-meta">
               <span>
                 Dominant mood:{" "}
-                {MOOD_TYPES[currentWeekInsight.dominantMood].emoji}{" "}
-                {MOOD_TYPES[currentWeekInsight.dominantMood].label}
+                {currentWeekInsight.dominantMood && MOOD_TYPES[currentWeekInsight.dominantMood] ? (
+                  <>
+                    {MOOD_TYPES[currentWeekInsight.dominantMood].emoji}{" "}
+                    {MOOD_TYPES[currentWeekInsight.dominantMood].label}
+                  </>
+                ) : (
+                  "Not available"
+                )}
               </span>
               <span>
                 Week of {formatDate(currentWeekInsight.weekStartDate)}
@@ -449,8 +455,14 @@ export default function MoodInsights({ userId }: MoodInsightsProps) {
                     Overall trend: <strong>{insight.overallMoodTrend}</strong>
                   </p>
                   <p className="dominant-mood">
-                    {MOOD_TYPES[insight.dominantMood].emoji} Mostly{" "}
-                    {MOOD_TYPES[insight.dominantMood].label.toLowerCase()}
+                    {insight.dominantMood && MOOD_TYPES[insight.dominantMood] ? (
+                      <>
+                        {MOOD_TYPES[insight.dominantMood].emoji} Mostly{" "}
+                        {MOOD_TYPES[insight.dominantMood].label.toLowerCase()}
+                      </>
+                    ) : (
+                      "Varied moods"
+                    )}
                   </p>
                 </div>
               </div>

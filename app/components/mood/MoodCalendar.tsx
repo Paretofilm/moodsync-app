@@ -275,8 +275,8 @@ export default function MoodCalendar({
 
             return {
               style: {
-                backgroundColor: `${MOOD_TYPES[dominantMoodType].color}20`,
-                border: `2px solid ${MOOD_TYPES[dominantMoodType].color}40`,
+                backgroundColor: dominantMoodType && MOOD_TYPES[dominantMoodType] ? `${MOOD_TYPES[dominantMoodType].color}20` : "#f0f0f020",
+                border: dominantMoodType && MOOD_TYPES[dominantMoodType] ? `2px solid ${MOOD_TYPES[dominantMoodType].color}40` : "2px solid #e0e0e040",
               },
             };
           }}
