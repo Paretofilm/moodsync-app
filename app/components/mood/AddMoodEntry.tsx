@@ -175,7 +175,7 @@ export default function AddMoodEntry({
             path="mood-selfies/"
             maxFileCount={1}
             onUploadSuccess={(event) => {
-              setUploadedPhoto(event.key);
+              setUploadedPhoto(event.key || null);
             }}
             onUploadError={(error) => {
               console.error("Upload error:", error);
