@@ -83,14 +83,17 @@ export default function AddMoodEntry({
 
     try {
       const spotifyData = spotifyLink ? parseSpotifyLink(spotifyLink) : null;
-      
+
       // Map mood type to color enum
-      const moodColorMap: Record<keyof typeof MOOD_TYPES, "YELLOW" | "BLUE" | "ORANGE" | "GREEN" | "PURPLE"> = {
+      const moodColorMap: Record<
+        keyof typeof MOOD_TYPES,
+        "YELLOW" | "BLUE" | "ORANGE" | "GREEN" | "PURPLE"
+      > = {
         HAPPY: "YELLOW",
         SAD: "BLUE",
         ENERGETIC: "ORANGE",
         CALM: "GREEN",
-        ANXIOUS: "PURPLE"
+        ANXIOUS: "PURPLE",
       };
 
       const moodEntry = {
