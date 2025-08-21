@@ -107,7 +107,9 @@ export default function MoodInsights({ userId }: MoodInsightsProps) {
         // Calculate mood distribution
         const moodDistribution = moods.reduce(
           (acc, mood) => {
-            acc[mood.moodType] = (acc[mood.moodType] || 0) + 1;
+            if (mood.moodType) {
+              acc[mood.moodType] = (acc[mood.moodType] || 0) + 1;
+            }
             return acc;
           },
           {} as Record<string, number>,
