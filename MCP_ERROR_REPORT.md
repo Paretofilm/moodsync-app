@@ -40,7 +40,26 @@ npm error Missing: globalize@0.1.1 from lock file
 1. ⚠️ Package-lock.json generation needs to be more robust
 2. ⚠️ Initial deployment should complete before pipeline setup (timing issue)
 
+## Issue 3: Node Version Mismatch in GitHub Actions
+
+**MCP Involved:** amplify-pipeline-mcp
+
+**Problem:** The pipeline MCP generated GitHub Actions workflow with Node 18, but modern Amplify packages require Node 20+
+
+**Error Details:**
+```
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@isaacs/balanced-match@4.0.1',
+npm warn EBADENGINE   required: { node: '20 || >=22' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+```
+
+**Root Cause:** Pipeline MCP defaults to Node 18 in GitHub Actions setup
+
+**Solution:** Update workflow to use Node 20
+
 ## Recommendations:
 1. Code generator should run `npm install` to generate a valid package-lock.json
 2. Pipeline MCP could check if initial deployment is complete before setup
 3. Add validation for package-lock.json consistency
+4. **Pipeline MCP should default to Node 20 for GitHub Actions workflows** (Node 18 is incompatible with modern Amplify packages)
