@@ -22,6 +22,7 @@ To complete the CI/CD pipeline setup, you need to add AWS credentials to your Gi
 ### Getting AWS Credentials:
 
 If you don't have AWS credentials:
+
 1. Go to AWS Console > IAM
 2. Create a new IAM user or use existing one
 3. Ensure the user has permissions for Amplify
@@ -30,6 +31,7 @@ If you don't have AWS credentials:
 ### Required Permissions:
 
 The IAM user needs at least:
+
 - AmplifyFullAccess (or more restrictive custom policy)
 - Ability to trigger Amplify builds
 
@@ -45,9 +47,11 @@ The IAM user needs at least:
 
 1. Add the AWS credentials to GitHub Secrets
 2. Re-run the failed workflow:
+
    ```bash
    gh run rerun 17137355120
    ```
+
    Or push any small change to trigger a new run
 
 3. The workflow will then:
@@ -58,6 +62,7 @@ The IAM user needs at least:
 ## Manual Amplify Deployment (Alternative):
 
 If you prefer to deploy manually while we fix the CI/CD:
+
 ```bash
 # In the project directory
 npm install

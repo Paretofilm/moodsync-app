@@ -84,6 +84,7 @@ npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
 **Problem:** The pipeline MCP didn't document that AWS credentials need to be added to GitHub secrets
 
 **Error Details:**
+
 ```
 Credentials could not be loaded, please check your action inputs: Could not load credentials from any providers
 ```
@@ -91,6 +92,7 @@ Credentials could not be loaded, please check your action inputs: Could not load
 **Root Cause:** AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY not configured in GitHub repository secrets
 
 **Solution:** User needs to add AWS credentials to GitHub repository secrets:
+
 1. Go to GitHub repository settings
 2. Navigate to Secrets and variables > Actions
 3. Add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
