@@ -5,13 +5,13 @@ applications:
       phases:
         build:
           commands:
-            - npm install
+            - npm ci
             - npx ampx generate outputs --branch $AWS_BRANCH --app-id $AWS_APP_ID
     frontend:
       phases:
         preBuild:
           commands:
-            - npm install
+            - npm ci
         build:
           commands:
             - npm run build
