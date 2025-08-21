@@ -1,5 +1,7 @@
 # MoodSync - Social Mood Tracking App
 
+[![Amplify Backend Pipeline](https://github.com/Paretofilm/moodsync-app/actions/workflows/amplify-pipeline-main.yml/badge.svg)](https://github.com/Paretofilm/moodsync-app/actions/workflows/amplify-pipeline-main.yml)
+
 A beautiful, social mood tracking application built with AWS Amplify Gen 2, Next.js, and React. Track your daily moods, share with friends, and get AI-powered insights about your emotional wellbeing.
 
 ## ✨ Features
