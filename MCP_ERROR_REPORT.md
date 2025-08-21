@@ -1,0 +1,46 @@
+# MCP Error Report - MoodSync App Testing
+
+## Issue 1: Package Lock File Conflicts
+
+**MCP Involved:** amplify-gen-2-code-generator
+
+**Problem:** The generated `package-lock.json` had dependency conflicts causing `npm ci` to fail in AWS Amplify build
+
+**Error Details:**
+```
+npm error Invalid: lock file's react-remove-scroll-bar@2.3.6 does not satisfy react-remove-scroll-bar@2.3.8
+npm error Invalid: lock file's react-style-singleton@2.2.1 does not satisfy react-style-singleton@2.2.3
+npm error Missing: dom-helpers@5.2.1 from lock file
+npm error Missing: globalize@0.1.1 from lock file
+```
+
+**Root Cause:** The code generator created a `package-lock.json` that was inconsistent with the actual dependencies
+
+**Solution:** Delete and regenerate package-lock.json
+
+## Issue 2: Agent Name Confusion
+
+**MCP Involved:** Task tool
+
+**Problem:** Tried to use `amplify-pipeline` as subagent_type but it doesn't exist
+
+**Error:** "Agent type 'amplify-pipeline' not found"
+
+**Solution:** Use the MCP directly with `mcp__amplify-pipeline__pipeline_deploy`
+
+## Observations
+
+### What Worked Well:
+1. ✅ amplify-gen-2-code-generator successfully created the complete app structure
+2. ✅ All Gen 2 patterns were correctly used (defineData, defineAuth, etc.)
+3. ✅ amplify-pipeline-mcp successfully set up CI/CD with auto-fix
+4. ✅ amplify-gen-2-nextjs-docs provided accurate documentation
+
+### What Needs Improvement:
+1. ⚠️ Package-lock.json generation needs to be more robust
+2. ⚠️ Initial deployment should complete before pipeline setup (timing issue)
+
+## Recommendations:
+1. Code generator should run `npm install` to generate a valid package-lock.json
+2. Pipeline MCP could check if initial deployment is complete before setup
+3. Add validation for package-lock.json consistency
