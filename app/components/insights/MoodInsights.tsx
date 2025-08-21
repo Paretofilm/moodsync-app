@@ -446,7 +446,7 @@ export default function MoodInsights({ userId }: MoodInsightsProps) {
           <h3>Previous Insights</h3>
           <div className="insights-list">
             {insights.slice(currentWeekInsight ? 1 : 0).map((insight) => (
-              <div key={insight.id} className="insight-card historical">
+              <div key={`${insight.userId}-${insight.weekStartDate}`} className="insight-card historical">
                 <div className="insight-header">
                   <h4>Week of {formatDate(insight.weekStartDate)}</h4>
                   <div className="insight-score small">
