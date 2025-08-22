@@ -151,7 +151,7 @@ export default function MoodFeed({
           setMoods((prev) => [...prev, ...sortedMoods]);
         }
 
-        setNextToken(result.nextToken);
+        setNextToken(result.nextToken || null);
         setHasMore(!!result.nextToken);
       }
     } catch (error) {
