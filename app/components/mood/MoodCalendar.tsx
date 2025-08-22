@@ -52,11 +52,13 @@ export default function MoodCalendar({
 
       return {
         id: mood.id,
-        title: `${moodData.emoji} ${moodData.label} (${mood.intensity}/10)`,
+        title: moodData 
+          ? `${moodData.emoji} ${moodData.label} (${mood.intensity}/10)`
+          : `Mood (${mood.intensity}/10)`,
         start: moodDate,
         end: moodDate,
         resource: mood,
-        color: moodData.color,
+        color: moodData?.color || "#808080",
       };
     });
 
