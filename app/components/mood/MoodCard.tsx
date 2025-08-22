@@ -51,12 +51,12 @@ export default function MoodCard({
         <div className="mood-indicator">
           <div
             className="mood-circle"
-            style={{ backgroundColor: moodData.color }}
+            style={{ backgroundColor: moodData?.color || "#808080" }}
           >
-            <span className="mood-emoji">{moodData.emoji}</span>
+            <span className="mood-emoji">{moodData?.emoji || "😐"}</span>
           </div>
           <div className="mood-info">
-            <h3 className="mood-type">{moodData.label}</h3>
+            <h3 className="mood-type">{moodData?.label || "Mood"}</h3>
             <p className="mood-intensity">
               {formatIntensity(mood.intensity)} intensity ({mood.intensity}/10)
             </p>
