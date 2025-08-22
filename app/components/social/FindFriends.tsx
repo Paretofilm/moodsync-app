@@ -139,7 +139,8 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
           .filter((user) => user.userId !== currentUserId)
           .map((user) => ({
             ...user,
-            friendshipStatus: (friendships.get(user.userId) || "NONE") as UserSearchResult["friendshipStatus"],
+            friendshipStatus: (friendships.get(user.userId) ||
+              "NONE") as UserSearchResult["friendshipStatus"],
           }));
 
         setSearchResults(usersWithStatus);
