@@ -134,8 +134,8 @@ export default function MoodFeed({
         // Filter for friends feed if necessary
         let filteredMoods = result.data;
         if (feedType === "friends" && friendIds.length > 0) {
-          filteredMoods = result.data.filter((mood) => 
-            friendIds.includes(mood.userId)
+          filteredMoods = result.data.filter((mood) =>
+            friendIds.includes(mood.userId),
           );
         }
 
