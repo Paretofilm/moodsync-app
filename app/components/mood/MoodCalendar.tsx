@@ -52,7 +52,7 @@ export default function MoodCalendar({
 
       return {
         id: mood.id,
-        title: moodData 
+        title: moodData
           ? `${moodData.emoji} ${moodData.label} (${mood.intensity}/10)`
           : `Mood (${mood.intensity}/10)`,
         start: moodDate,
