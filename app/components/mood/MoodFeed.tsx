@@ -117,14 +117,12 @@ export default function MoodFeed({
             return;
           }
 
+          // Fetch all public moods and filter client-side for friends
+          // Note: This is a temporary solution. In production, you'd want
+          // to use a more efficient server-side filtering approach
           query = client.models.Mood.list({
-            filter: {
-              and: [
-                { userId: { in: friendIds } },
-                { isPrivate: { eq: false } },
-              ],
-            },
-            limit,
+            filter: { isPrivate: { eq: false } },
+            limit: limit * 2, // Fetch more to account for filtering
             nextToken: refresh ? null : nextToken,
           });
           break;
@@ -133,7 +131,15 @@ export default function MoodFeed({
       const result = await query;
 
       if (result.data) {
-        const sortedMoods = result.data.sort(
+        // Filter for friends feed if necessary
+        let filteredMoods = result.data;
+        if (feedType === "friends" && friendIds.length > 0) {
+          filteredMoods = result.data.filter((mood) => 
+            friendIds.includes(mood.userId)
+          );
+        }
+
+        const sortedMoods = filteredMoods.sort(
           (a, b) =>
             new Date(b.createdAt || "").getTime() -
             new Date(a.createdAt || "").getTime(),
