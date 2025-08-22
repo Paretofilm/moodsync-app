@@ -74,7 +74,7 @@ export default function FriendsList({
           userId: otherUserId,
         });
 
-        if (userProfile.data) {
+        if (userProfile.data && friendship.status) {
           const friend: Friend = {
             ...userProfile.data,
             friendshipStatus: friendship.status,
