@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import { Calendar, momentLocalizer, View } from "react-big-calendar";
 import moment from "moment";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../../amplify/data/resource";
@@ -37,7 +37,7 @@ export default function MoodCalendar({
   const [events, setEvents] = useState<MoodEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [viewType, setViewType] = useState<"month" | "week" | "day">("month");
+  const [viewType, setViewType] = useState<View>("month");
 
   // Fetch moods for the current user
   useEffect(() => {
@@ -203,7 +203,7 @@ export default function MoodCalendar({
 
       {/* View Type Selector */}
       <div className="view-selector">
-        {(["month", "week", "day"] as const).map((view) => (
+        {(["month", "week", "day"] as View[]).map((view) => (
           <button
             key={view}
             className={`view-button ${viewType === view ? "active" : ""}`}
