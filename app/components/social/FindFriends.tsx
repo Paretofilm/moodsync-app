@@ -135,11 +135,11 @@ export default function FindFriends({ onFriendRequestSent }: FindFriendsProps) {
 
       if (result.data) {
         // Filter out current user and add friendship status
-        const usersWithStatus = result.data
+        const usersWithStatus: UserSearchResult[] = result.data
           .filter((user) => user.userId !== currentUserId)
           .map((user) => ({
             ...user,
-            friendshipStatus: friendships.get(user.userId) || "NONE",
+            friendshipStatus: (friendships.get(user.userId) || "NONE") as UserSearchResult["friendshipStatus"],
           }));
 
         setSearchResults(usersWithStatus);
